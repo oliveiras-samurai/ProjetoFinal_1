@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block titulo %}SERVIÇOS{% endblock %}
+
+{% block conteudo %}
+    <div class="cabecalho-pagina">
+        <div>
+            <h1>🛅 SERVIÇOS</h1>
+            <p class="subtitulo">Cadastro das OS</p>
+        </div>
+        {% if not editar and request.endpoint != 'novo_servico' %}
+        <a href="{{ url_for('novo_servico') }}" class="botao">+ Nova OS</a>
+        {% endif %}
+    </div>
+
+    {% if request.endpoint == 'novo_servico' or editar %}
+    <section class="painel formulario">
+        <h2>Nova OS</h2>
+        <form method="POST" action="{{ url_for('editar_servico', id_servico=editar.id) if editar else url_for('novo_servico')}}">
+
+            <div class="campo">
+                <label for="nome">Nome da OS </label>
+                <input type="text" id="nome" name="nome"  value="{{ editar.nome if editar else '' }}">
+            </div>
+
+            <div class="linha-campos">
+                <div class="campo">
+                    <label for="data_abertura">Data abertura </label>
+                    <input type="datetime-local" id="data_abertura" name="data_abertura"  value="{{ editar.data_abertura if editar else '' }}">
+                </div>
+
+                <div class="campo">
+                    <label for="data_encerramento">Data encerramento </label>
+                    <input type="datetime-local" id="data_encerramento" name="data_encerramento"  value="{{ editar.data_encerramento if editar else '' }}">
+                </div>
+            </div>
+
+            <div class="linha-campos">
+                <div class="campo">
+                    <label for="id_responsavel">Usuário</label>
+                    <input type="text" id="id_responsavel" name="id_responsavel"  value="{{ editar.id_responsavel if editar else '' }}">
+                </div>
+
+                <div class="campo campo-cor">
+                    <label for="status_servico">Status da OS</label>
+                    <select id="status_servico" name="status_servico">
+                    {% if editar %}
+                    <option value="{{ editar.status_servico}}" selected>{{ editar.status_servico}}</option>
+                    {% endif %}
+                        <option value="Não iniciada">Não iniciada</option>
+                        <option value="Em espera">Em espera</option>
+                        <option value="Iniciada">Iniciada</option>
+                        <option value="Finalizada">Finalizada</option>
+                    </select>
+                </div>
+            </div>
+
+             <div style="margin-bottom: 35px;">
+                <label style="display: block; font-weight: bold; color: #2b6cb0; margin-bottom: 12px; font-size: 15px;">Quais equipamentos serão utilizados?</label>
+
+                <div style="background: #fdfbfd; border: 1px solid #cbd5e1; border-radius: 6px; padding: 15px; display: flex; flex-direction: column; gap: 10px; max-height: 150px; overflow-y: auto;">
+                    {% for item in lista_equipamentos %}
+                    <label style="display: flex; align-items: center; gap: 10px; font-weight: 500; color: #333; cursor: pointer; font-size: 14px; margin: 0;">
+                    <input type="checkbox" id="equipamento" name="equipamento" value="{{item.nome }}" style="width: 16px; height: 16px; cursor: pointer;">
+                        <span>{{ item.Equipamento.nome }} <small style="color: #666;">({{ item.Equipamento.tipo }})</small></span>
+                    </label>
+                    {% else %}
+                    <p style="color: #666; font-size: 14px; margin: 0; font-style: italic;">
+                        Nenhum equipamento cadastrado para seleção.
+                    </p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div style="margin-bottom: 35px;">
+                <label style="display: block; font-weight: bold; color: #2b6cb0; margin-bottom: 12px; font-size: 15px;">Quais recursos serão utilizados?</label>
+
+                <div style="background: #fdfbfd; border: 1px solid #cbd5e1; border-radius: 6px; padding: 15px; display: flex; flex-direction: column; gap: 10px; max-height: 150px; overflow-y: auto;">
+                    {% for item in lista_recursos %}
+                    <label style="display: flex; align-items: center; gap: 10px; font-weight: 500; color: #333; cursor: pointer; font-size: 14px; margin: 0;">
+                        <input type="checkbox" id="recurso" value="{{ item.nome }}" style="width: 16px; height: 16px; cursor: pointer;">
+                        <span>{{ item.Recursos.nome }}</span>
+                    </label>
+                    {% else %}
+                    <p style="color: #666; font-size: 14px; margin: 0; font-style: italic;">
+                        Nenhum recurso cadastrado para seleção.
+                    </p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="linha-campos">
+                <div class="campo campo-cor">
+                    <label for="prioridade">Prioridade</label>
+                    <select id="prioridade" name="prioridade">
+                    {% if editar %}
+                    <option value="{{ editar.prioridade}}" selected>{{ editar.prioridade}}</option>
+                    {% endif %}
+                        <option value="Baixa">Baixa</option>
+                        <option value="Média">Média</option>
+                        <option value="Alta">Alta</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="acoes-form">
+                <button type="submit" class="botao">Cadastrar</button>
+                <a href="{{ url_for('listar_servicos') }}" class="botao botao-secundario">Cancelar</a>
+            </div>
+        </form>
+    </section>
+    {% endif %}
+
+    <section class="painel">
+        <h2>Lista de OS</h2>
+        {% if servicos %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Nome</th>
+                    <th>Data Abertura</th>
+                    <th>Data Encerramento</th>
+                    <th>Responsável</th>
+                    <th>Status</th>
+                    <th>Equipamentos</th>
+                    <th>Recursos</th>
+                    <th>Prioridade</th>
+                    <th class="acoes-col">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for servico in servicos %}
+                <tr>
+                    <td>{{ servico.id }}</td>
+                    <td>{{ servico.nome }}</td>
+                    <td>{{ servico.data_abertura }}</td>
+                    <td>{{ servico.data_encerramento }}</td>
+                    <td>{{ servico.id_responsavel }}</td>
+                    <td>{{ servico.status_servico}}</td>
+                    <td>{{ servico.equipamento }}</td>
+                    <td>{{ servico.recurso }}</td>
+                    <td>{{ servico.prioridade}} </td>
+                    <td class="acoes-col">
+                        <a href="{{ url_for('excluir_servico', servico_id=servico.id) }}" class="link-acao link-perigo"> 🗑️Excluir</a>  /<a href="{{ url_for('editar_servico', id_servico=servico.id) }}"> 🛠️Editar</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+            <p class="vazio">Nenhum serviço cadastrado ainda.</p>
+        {% endif %}
+    </section>
+{% endblock %}

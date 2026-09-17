@@ -1,51 +1,69 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskFlow</title>
-    <!-- Link para o seu arquivo CSS que gerencia as cores e fontes -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>{% block titulo %}Serviço{% endblock %} - Gestão de Serviços</title>
+    <link rel="stylesheet" href="/static/style_projeto_final.css">
 </head>
-<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3e5f5; min-height: 100vh;">
+<body>
 
-    <!-- 1. BARRA DE NAVEGAÇÃO SUPERIOR MINIMALISTA -->
-    <header class="navbar-topo">
-        <div class="navbar-container">
+    <div class="layout">
 
-            <!-- Lado Esquerdo: Logotipo Simples e Links de Texto -->
-            <div class="navbar-links-bloco">
-                <!-- Ícone circular simulando logo -->
-                <div class="logo-circular"></div>
+        <!-- MENU VERTICAL -->
+        <nav class="menu-lateral">
+            <div class="menu-titulo">🏆 Plano Corp | Gestão de Serviços</div>
+            <ul>
+                <li>
+                    <a href="{{ url_for('dashboard') }}"
+                       class="{{ 'ativo' if request.endpoint == 'dashboard' else '' }}">
+                       <span class="icone">📊</span> Relatório
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('listar_usuarios') }}"
+                       class="{{ 'ativo' if 'usuario' in request.endpoint else '' }}">
+                       <span class="icone">🧑‍🤝‍🧑</span> Usuários
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('listar_servicos') }}"
+                       class="{{ 'ativo' if request.endpoint and 'servico' in request.endpoint else '' }}">
+                       <span class="icone">🛡️</span> Serviços
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('listar_equipamentos') }}"
+                       class="{{ 'ativo' if 'equipamento' in request.endpoint else '' }}">
+                       <span class="icone">⚽</span> Equipamentos
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ url_for('listar_recursos') }}"
+                       class="{{ 'ativo' if 'recurso' in request.endpoint else '' }}">
+                       <span class="icone">🫆</span> Recursos
+                    </a>
+                </li>
+            </ul>
+        </nav>
 
-                <nav class="links-navegacao">
-                    <a href="{{ url_for('index') }}" class="link-menu-texto">Menu</a>
-                    <a href="{{ url_for('pessoa') }}" class="link-menu-texto">Usuário</a>
-                    <a href="{{ url_for('listar_atividades') }}" class="link-menu-texto">Tarefas</a>
-                    <a href="{{ url_for('listar_recursos') }}" class="link-menu-texto">Recursos</a>
-                </nav>
-            </div>
+        <!-- CONTEÚDO -->
+        <main class="conteudo">
+            {% with mensagens = get_flashed_messages(with_categories=true) %}
+                {% if mensagens %}
+                    <div class="flash-container">
+                        {% for categoria, mensagem in mensagens %}
+                            <div class="flash flash-{{ categoria }}">{{ mensagem }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
 
-            <!-- Lado Direito: Foto de Perfil Redonda e Identificação Dinâmica -->
-            <div class="perfil-usuario-topo">
-                <img src="https://i.pinimg.com/736x/c0/41/7a/c0417a53e6f15626c75b043405e3dcbe.jpg" alt="Foto de Perfil" class="avatar-topo">
-                <div class="info-usuario-topo">
-                    <!-- Mostra o nome cadastrado ou 'Duda' como padrão -->
-                    <span class="nome-topo">{{ session.get('perfil_nome', 'Vitor') }}</span>
-                    <span class="cargo-topo">Online</span>
-                </div>
-            </div>
-
-        </div>
-    </header>
-
-    <!-- 2. CONTEÚDO PRINCIPAL (Exibição dos cards, tabelas e formulários abaixo da navbar) -->
-    <main class="layout-principal-tabelas">
-        <div class="conteudo-dinamico">
             {% block conteudo %}
-            {% endblock conteudo %}
-        </div>
-    </main>
+            {% endblock %}
+        </main>
+
+    </div>
 
 </body>
 </html>

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block titulo %}Dashboard{% endblock %}
+
+{% block conteudo %}
+    <h1>Dados do Site</h1>
+    <p class="subtitulo">Relatório Geral</p>
+
+    <div class="cartoes">
+        <div class="cartao">
+            <div class="cartao-valor">{{ total_servicos }}</div>
+            <div class="cartao-label">Serviços</div>
+        </div>
+        <div class="cartao">
+            <div class="cartao-valor">{{ total_usuarios }}</div>
+            <div class="cartao-label">Usuários</div>
+        </div>
+        <div class="cartao">
+            <div class="cartao-valor">{{ total_equipamentos }}</div>
+            <div class="cartao-label">Equipamentos</div>
+        </div>
+        <div class="cartao">
+            <div class="cartao-valor">{{ total_recursos }}</div>
+            <div class="cartao-label">Recursos</div>
+        </div>
+    </div>
+
+    <div class="grid-dashboard">
+
+    </div>
+{% endblock %}

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Gestão de Serviços Interclasse</title>
+    <link rel="stylesheet" href="/static/style_projeto_final.css">
+</head>
+<body class="body-login">
+
+    <div class="container-login">
+        <!-- Cabeçalho do Cartão de Login -->
+        <div class="login-header">
+            <span class="login-logo">🏆</span>
+            <h1>Login</h1>
+            <p>Faça login para gerenciar os serviços e dados</p>
+        </div>
+
+        <!-- Exibição de mensagens flash de erro ou sucesso -->
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% if mensagens %}
+                <div class="flash-container">
+                    {% for categoria, mensagem in mensagens %}
+                        <div class="flash flash-{{ categoria }}">{{ mensagem }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <!-- Formulário de Login -->
+        <form action="{{ url_for('login') }}" method="POST" class="login-form">
+
+            <div class="grupo-campo">
+                <label for="email">E-mail</label>
+                <div class="input-com-icone">
+                    <span class="input-icone">📧</span>
+                    <input type="email" id="email" name="email" placeholder="seu@email.com" required autocomplete="email">
+                </div>
+            </div>
+
+            <div class="grupo-campo">
+                <label for="senha">Senha</label>
+                <div class="input-com-icone">
+                    <span class="input-icone">🔒</span>
+                    <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required>
+                </div>
+            </div>
+
+            <button type="submit" class="botao-login">Entrar no Sistema</button>
+        </form>
+
+        <div class="login-footer">
+            <p>Esqueceu sua senha? <a href="#">Clique aqui</a></p>
+        </div>
+    </div>
+
+</body>
+</html>
