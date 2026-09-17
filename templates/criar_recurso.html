@@ -1,0 +1,38 @@
+% extends 'base.html' %}
+{% block conteudo %}
+
+<div class="recurso-container">
+    <h1 class="recurso-titulo-pagina">Adicionar Recurso</h1>
+    <p class="recurso-subtitulo">Cadastre materiais, softwares ou equipamentos necessários para a execução das tarefas.</p>
+
+    <form action="{{ url_for('criar_recurso') }}" method="POST">
+
+        <div class="recurso-grupo">
+            <label for="form_nome_recurso" class="recurso-label"> Nome do Recurso:</label>
+            <input type="text" id="form_nome_recurso" name="form_nome_recurso" placeholder="Ex: Projetor Dell, Notebook..." required class="recurso-input">
+        </div>
+
+        <div class="recurso-grupo">
+            <label for="form_tipo_recurso" class="recurso-label">️ Tipo de Recurso:</label>
+            <select id="form_tipo_recurso" name="form_tipo_recurso" class="recurso-select">
+                <option value="Material">Material</option>
+                <option value="Equipamento">Equipamento</option>
+                <option value="Software">Software</option>
+                <option value="Outros">Outros</option>
+            </select>
+        </div>
+
+        <div class="recurso-grupo">
+            <label for="form_quantidade" class="recurso-label"> Quantidade Disponível:</label>
+            <input type="number" id="form_quantidade" name="form_quantidade" min="1" value="1" required class="recurso-input">
+        </div>
+
+        <div class="recurso-acoes">
+            <button type="submit" class="recurso-btn-salvar"> Salvar Recurso</button>
+            <a href="{{ url_for('listar_recursos') }}" class="recurso-btn-cancelar">Cancelar</a>
+        </div>
+
+    </form>
+</div>
+
+{% endblock conteudo %}

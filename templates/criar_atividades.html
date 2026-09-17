@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+
+<div style="max-width: 650px; margin: 0 auto; background: #ffffff; padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(142, 36, 170, 0.05); border: 1px solid #f3e5f5;">
+
+   <h1 style="font-size: 28px; font-weight: 700; color: #4a148c; margin-top: 0; margin-bottom: 8px;">Criar Atividade</h1>
+   <p style="color: #666; font-size: 14px; margin-bottom: 30px;">Preencha os dados abaixo para registrar uma nova tarefa no sistema.</p>
+
+   <form action="{{ url_for('criar_atividade') }}" method="POST">
+
+       <!-- Campo: Nome da Atividade -->
+       <div style="margin-bottom: 25px;">
+           <label for="form_nome" style="display: block; font-weight: bold; color: #4a148c; margin-bottom: 8px; font-size: 15px;">Nome da Atividade:</label>
+           <input type="text" id="form_nome" name="form_nome" placeholder="Digite o nome da tarefa" required
+                  style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; box-sizing: border-box; outline: none; background: #fdfbfd;">
+       </div>
+
+       <!-- Campo: Data / Estipular Prazo (CORRIGIDO) -->
+       <div style="margin-bottom: 25px;">
+           <label for="form_data_atividades" style="display: block; font-weight: bold; color: #4a148c; margin-bottom: 8px; font-size: 15px;">Data:</label>
+           <input type="date" id="form_data_atividades" name="form_data_atividades" required
+                  style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; box-sizing: border-box; outline: none; background: #fdfbfd; color: #333333;">
+       </div>
+
+       <!-- Campo: Descrição -->
+       <div style="margin-bottom: 25px;">
+           <label for="form_descricao" style="display: block; font-weight: bold; color: #4a148c; margin-bottom: 8px; font-size: 15px;">Descrição da atividade:</label>
+           <textarea id="form_descricao" name="form_descricao" placeholder="Escreva o que precisa ser feito..." rows="4" required
+                     style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; box-sizing: border-box; outline: none; font-family: inherit; resize: vertical; background: #fdfbfd;"></textarea>
+       </div>
+
+       <!-- Campo: Seleção de Nível de Prioridade -->
+       <div style="margin-bottom: 25px;">
+           <label for="form_tipo" style="display: block; font-weight: bold; color: #4a148c; margin-bottom: 12px; font-size: 15px;">Qual o nível de prioridade?</label>
+           <select id="form_tipo" name="form_tipo" required
+                   style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; background-color: #ffffff; box-sizing: border-box; outline: none; color: #333333; cursor: pointer;">
+               <option value="Baixa">⭐ Baixa</option>
+               <option value="Média">⭐⭐ Média</option>
+               <option value="Máxima">⭐⭐⭐ Máxima</option>
+           </select>
+       </div>
+
+       <!-- Campo: Seleção Dinâmica de Itens / Recursos -->
+       <div style="margin-bottom: 35px;">
+           <label style="display: block; font-weight: bold; color: #4a148c; margin-bottom: 12px; font-size: 15px;">Quais itens serão utilizados na sua atividade?</label>
+
+           <div style="background: #fdfbfd; border: 1px solid #cbd5e1; border-radius: 6px; padding: 15px; display: flex; flex-direction: column; gap: 10px; max-height: 150px; overflow-y: auto;">
+               {% for recurso in lista_recursos %}
+               <label style="display: flex; align-items: center; gap: 10px; font-weight: 500; color: #333; cursor: pointer; font-size: 14px; margin: 0;">
+                   <input type="checkbox" name="form_item" value="{{ recurso.nome }}" style="width: 16px; height: 16px; cursor: pointer;">
+                   <span>{{ recurso.nome }} <small style="color: #666;">({{ recurso.tipo }} - Qtd: {{ recurso.quantidade }})</small></span>
+               </label>
+               {% else %}
+               <p style="color: #666; font-size: 14px; margin: 0; font-style: italic;">
+                   Nenhum recurso cadastrado para seleção.
+               </p>
+               {% endfor %}
+           </div>
+       </div>
+
+       <!-- Botões de Ação Inferiores -->
+       <div style="display: flex; gap: 15px;">
+           <button type="submit" style="flex: 1; padding: 14px; background: #8e24aa; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#7b1fa2'" onmouseout="this.style.background='#8e24aa'">
+               Salvar Atividade
+           </button>
+           <a href="{{ url_for('listar_atividades') }}" style="flex: 1; padding: 14px; background: #f5f5f5; color: #666; border: 1px solid #e0e0e0; border-radius: 6px; font-weight: 500; font-size: 15px; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmouseover="this.style.background='#eeeeee'" onmouseout="this.style.background='#f5f5f5'">
+               Limpar / Retornar
+           </a>
+       </div>
+
+   </form>
+</div>
+
+{% endblock conteudo %}

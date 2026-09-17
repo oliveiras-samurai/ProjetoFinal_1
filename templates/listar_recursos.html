@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+    <div>
+        <h1 style="font-size: 28px; font-weight: 600; color: #4a148c; margin: 0;">Inventário de Recursos</h1>
+        <p style="color: #666; margin: 5px 0 0 0; font-size: 14px;">Consulta e controle de ativos operacionais disponíveis.</p>
+    </div>
+    <!-- O NOVO BOTÃO DE CADASTRAR INTERNO -->
+    <a href="{{ url_for('criar_recurso') }}" class="btn-cadastrar-tabela">
+        ➕ Novo Recurso
+    </a>
+</div>
+
+<!-- CONTAINER DA TABELA -->
+<div class="tabela-container">
+    <table class="tabela-corporativa">
+        <thead>
+            <tr>
+                <th>Nome do Recurso</th>
+                <th>Categoria</th>
+                <th>Volume Disponível</th>
+                <th style="text-align: center;">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for recurso in dados_recursos %}
+            <tr>
+                <td style="font-weight: 600;">{{ recurso.nome }}</td>
+                <td>
+                    <span style="background: #e1bee7; color: #4a148c; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                        {{ recurso.tipo }}
+                    </span>
+                </td>
+                <td style="color: #666; font-weight: 600;">{{ recurso.quantidade }} un</td>
+                <td style="text-align: center;">
+                    <form action="/recursos/excluir/{{ recurso.id }}" method="POST" style="margin: 0; display: inline-block;">
+                        <button type="submit" class="btn-excluir-tabela">Excluir</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" style="padding: 30px; text-align: center; color: #8e24aa; font-weight: bold;">
+                    Nenhum ativo localizado no inventário.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock conteudo %}
