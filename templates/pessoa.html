@@ -32,8 +32,8 @@
                 <div style="margin-bottom: 5px;">
                     <label style="display: block; font-weight: bold; color: #aa6724; margin-bottom: 5px; font-size: 14px;">Status:</label>
                     <select name="perfil_status" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; background: white; box-sizing: border-box;">
-                        <option value="Ativo" {% if usuario.status == 'Ativo' %}selected{% endif %}>Ativo</option>
-                        <option value="Inativo" {% if usuario.status == 'Inativo' %}selected{% endif %}>Inativo</option>
+                        <option value="Ativo" {% if usuario.status =='Ativo' %}selected{% endif %}>Ativo</option>
+                        <option value="Inativo" {% if usuario.status =='Inativo' %}selected{% endif %}>Inativo</option>
                     </select>
                 </div>
             </div>
