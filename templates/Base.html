@@ -1,51 +1,51 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>TaskFlow</title>
-   <!-- Link para o seu arquivo CSS que gerencia as cores e fontes -->
-   <link rel="stylesheet" href="{{ url_for('static', filename='cor_base_projeto_taskflow.css') }}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow</title>
+    <!-- Link para o seu arquivo CSS que gerencia as cores e fontes -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3e5f5; min-height: 100vh;">
 
-   <!-- 1. BARRA DE NAVEGAÇÃO SUPERIOR MINIMALISTA -->
-   <header class="navbar-topo">
-       <div class="navbar-container">
+    <!-- 1. BARRA DE NAVEGAÇÃO SUPERIOR MINIMALISTA -->
+    <header class="navbar-topo">
+        <div class="navbar-container">
 
-           <!-- Lado Esquerdo: Logotipo Simples e Links de Texto -->
-           <div class="navbar-links-bloco">
-               <!-- Ícone circular simulando logo -->
-               <div class="logo-circular"></div>
+            <!-- Lado Esquerdo: Logotipo Simples e Links de Texto -->
+            <div class="navbar-links-bloco">
+                <!-- Ícone circular simulando logo -->
+                <div class="logo-circular"></div>
 
-               <nav class="links-navegacao">
-                   <a href="{{ url_for('index') }}" class="link-menu-texto">Home</a>
-                   <a href="{{ url_for('pessoa') }}" class="link-menu-texto">Perfil</a>
-                   <a href="{{ url_for('listar_atividades') }}" class="link-menu-texto">Tabela 1</a>
-                   <a href="{{ url_for('listar_recursos') }}" class="link-menu-texto">Tabela 2</a>
-               </nav>
-           </div>
+                <nav class="links-navegacao">
+                    <a href="{{ url_for('index') }}" class="link-menu-texto">Menu</a>
+                    <a href="{{ url_for('pessoa') }}" class="link-menu-texto">Usuário</a>
+                    <a href="{{ url_for('listar_atividades') }}" class="link-menu-texto">Tarefas</a>
+                    <a href="{{ url_for('listar_recursos') }}" class="link-menu-texto">Recursos</a>
+                </nav>
+            </div>
 
-           <!-- Lado Direito: Foto de Perfil Redonda e Identificação Dinâmica -->
-           <div class="perfil-usuario-topo">
-               <img src="https://i.pinimg.com/1200x/a3/4d/d7/a34dd729d2255c060d03753dd8f3a5e0.jpg" alt="Foto de Perfil" class="avatar-topo">
-               <div class="info-usuario-topo">
-                   <!-- Mostra o nome cadastrado ou 'Duda' como padrão -->
-                   <span class="nome-topo">{{ session.get('perfil_nome', 'Duda') }}</span>
-                   <span class="cargo-topo">Adm</span>
-               </div>
-           </div>
+            <!-- Lado Direito: Foto de Perfil Redonda e Identificação Dinâmica -->
+            <div class="perfil-usuario-topo">
+                <img src="https://i.pinimg.com/736x/c0/41/7a/c0417a53e6f15626c75b043405e3dcbe.jpg" alt="Foto de Perfil" class="avatar-topo">
+                <div class="info-usuario-topo">
+                    <!-- Mostra o nome cadastrado ou 'Duda' como padrão -->
+                    <span class="nome-topo">{{ session.get('perfil_nome', 'Vitor') }}</span>
+                    <span class="cargo-topo">Online</span>
+                </div>
+            </div>
 
-       </div>
-   </header>
+        </div>
+    </header>
 
-   <!-- 2. CONTEÚDO PRINCIPAL (Exibição dos cards, tabelas e formulários abaixo da navbar) -->
-   <main class="layout-principal-tabelas">
-       <div class="conteudo-dinamico">
-           {% block conteudo %}
-           {% endblock conteudo %}
-       </div>
-   </main>
+    <!-- 2. CONTEÚDO PRINCIPAL (Exibição dos cards, tabelas e formulários abaixo da navbar) -->
+    <main class="layout-principal-tabelas">
+        <div class="conteudo-dinamico">
+            {% block conteudo %}
+            {% endblock conteudo %}
+        </div>
+    </main>
 
 </body>
 </html>

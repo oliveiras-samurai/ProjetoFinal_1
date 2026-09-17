@@ -3,8 +3,8 @@
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
     <div>
-        <h1 style="font-size: 28px; font-weight: 600; color: #4a148c; margin: 0;">Inventário de Recursos</h1>
-        <p style="color: #666; margin: 5px 0 0 0; font-size: 14px;">Consulta e controle de ativos operacionais disponíveis.</p>
+        <h1 style="font-size: 28px; font-weight: 600; color: #aa2424; margin: 0;">Recursos</h1>
+        <p style="color: #666; margin: 5px 0 0 0; font-size: 14px;">Consulta e controle de recursos disponíveis.</p>
     </div>
     <!-- O NOVO BOTÃO DE CADASTRAR INTERNO -->
     <a href="{{ url_for('criar_recurso') }}" class="btn-cadastrar-tabela">
@@ -19,8 +19,8 @@
             <tr>
                 <th>Nome do Recurso</th>
                 <th>Categoria</th>
-                <th>Volume Disponível</th>
-                <th style="text-align: center;">Ações</th>
+                <th>Quantidade no Estoque</th>
+                <th style="text-align: center;">Ação</th>
             </tr>
         </thead>
         <tbody>
@@ -28,7 +28,7 @@
             <tr>
                 <td style="font-weight: 600;">{{ recurso.nome }}</td>
                 <td>
-                    <span style="background: #e1bee7; color: #4a148c; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold;">
+                    <span style="background: #aa2424; color: #aa7024; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold;">
                         {{ recurso.tipo }}
                     </span>
                 </td>
@@ -41,8 +41,8 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="4" style="padding: 30px; text-align: center; color: #8e24aa; font-weight: bold;">
-                    Nenhum ativo localizado no inventário.
+                <td colspan="4" style="padding: 30px; text-align: center; color: #aa5c24; font-weight: bold;">
+                    Nenhum recurso localizado no estoque.
                 </td>
             </tr>
             {% endfor %}
