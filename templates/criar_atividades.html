@@ -1,50 +1,52 @@
 {% extends 'base.html' %}
 {% block conteudo %}
 
-<div style="max-width: 650px; margin: 0 auto; background: #ffffff; padding: 35px; border-radius: 12px; box-shadow: 0 4px 20px rgba(142, 36, 170, 0.05); border: 1px solid #f3e5f5;">
+<div class="recurso-container">
+    <h1 class="recurso-titulo-pagina">Adicionar Tarefa</h1>
+    <p class="recurso-subtitulo">Cadastre as informações necessárias para a execução da tarefa.</p>
 
-    <h1 style="font-size: 28px; font-weight: 700; color: #aa2424; margin-top: 0; margin-bottom: 8px;">Criar Nova Tarefa</h1>
-    <p style="color: #666; font-size: 14px; margin-bottom: 30px;">Preencha os dados abaixo para registrar uma nova tarefa no sistema.</p>
-
+    <!-- CORREÇÃO 1: Mudado action="#" para a rota correta do Flask que salva os dados -->
     <form action="{{ url_for('criar_atividade') }}" method="POST">
 
-        <!-- Campo: Nome da Atividade -->
-        <div style="margin-bottom: 25px;">
-            <label for="form_nome" style="display: block; font-weight: bold; color: #aa7024; margin-bottom: 8px; font-size: 15px;">Nome da Atividade:</label>
-            <input type="text" id="form_nome" name="form_nome" placeholder="Digite o nome da tarefa" required
-                   style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; box-sizing: border-box; outline: none; background: #fdfbfd;">
+        <!-- Campo 1: Nome -->
+        <div class="recurso-grupo">
+            <label for="form_nome_tarefa" class="recurso-label"> Nome da Tarefa:</label>
+            <input type="text" id="form_nome_tarefa" name="form_nome_tarefa" placeholder="Ex: Manutenção Preventiva, Troca de Óleo" required class="recurso-input">
         </div>
 
-        <!-- Campo: Data / Estipular Prazo (CORRIGIDO) -->
-        <div style="margin-bottom: 25px;">
-            <label for="form_data_atividades" style="display: block; font-weight: bold; color: #aa6724; margin-bottom: 8px; font-size: 15px;">Data de Entrega:</label>
-            <input type="date" id="form_data_atividades" name="form_data_atividades" required
-                   style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; box-sizing: border-box; outline: none; background: #fdfbfd; color: #333333;">
+        <!-- Campo 2: Data de Abertura -->
+        <div class="recurso-grupo">
+            <label for="form_data_abertura" class="recurso-label"> Data de Abertura:</label>
+            <input type="date" id="form_data_abertura" name="form_data_abertura" required class="recurso-input">
         </div>
 
-        <!-- Campo: Descrição -->
-        <div style="margin-bottom: 25px;">
-            <label for="form_descricao" style="display: block; font-weight: bold; color: #a2631f; margin-bottom: 8px; font-size: 15px;">Descrição da atividade:</label>
-            <textarea id="form_descricao" name="form_descricao" placeholder="Escreva o que precisa ser feito..." rows="4" required
-                      style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; box-sizing: border-box; outline: none; font-family: inherit; resize: vertical; background: #fdfbfd;"></textarea>
+        <!-- Campo 3: Data de Encerramento -->
+        <div class="recurso-grupo">
+            <label for="form_data_encerramento" class="recurso-label"> Data de Encerramento:</label>
+            <input type="date" id="form_data_encerramento" name="form_data_encerramento" class="recurso-input">
         </div>
 
-        <!-- Campo: Seleção de Nível de Prioridade -->
-        <div style="margin-bottom: 25px;">
-            <label for="form_tipo" style="display: block; font-weight: bold; color: #aa5c24; margin-bottom: 12px; font-size: 15px;">Qual o nível de prioridade?(1-3)</label>
-            <select id="form_tipo" name="form_tipo" required
-                    style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 15px; background-color: #ffffff; box-sizing: border-box; outline: none; color: #333333; cursor: pointer;">
-                <option value="1"> 1</option>
-                <option value="2"> 2</option>
-                <option value="3"> 3</option>
+        <!-- Campo 4: ID do Responsável -->
+        <div class="recurso-grupo">
+            <label for="form_id_responsavel" class="recurso-label"> ID do Responsável:</label>
+            <input type="number" id="form_id_responsavel" name="form_id_responsavel" placeholder="Ex: 1024" min="1" required class="recurso-input">
+        </div>
+
+        <!-- Campo 5: Status da Tarefa -->
+        <div class="recurso-grupo">
+            <label for="form_status_tarefa" class="recurso-label"> Status da Tarefa:</label>
+            <select id="form_status_tarefa" name="form_status_tarefa" class="recurso-select">
+                <option value="Pendente">Pendente</option>
+                <option value=" Andamento">Andamento</option>
+                <option value="Concluída">Concluída</option>
+                <option value="Cancelada">Cancelada</option>
             </select>
         </div>
 
-        <!-- Campo: Seleção Dinâmica de Itens / Recursos -->
-        <div style="margin-bottom: 35px;">
-            <label style="display: block; font-weight: bold; color: #aa5c24; margin-bottom: 12px; font-size: 15px;">Quais recursos serão utilizados na sua tarefa?</label>
-
-            <div style="background: #fdfbfd; border: 1px solid #cbd5e1; border-radius: 6px; padding: 15px; display: flex; flex-direction: column; gap: 10px; max-height: 150px; overflow-y: auto;">
+        <!-- Campo 6: Equipamento utilizado -->
+        <div style="margin-bottom: 25px;">
+            <label style="display: block; font-weight: bold; color: #7b1fa2; margin-bottom: 8px; font-size: 14px;">Quais recursos serão utilizados?</label>
+            <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 15px; display: flex; flex-direction: column; gap: 10px; max-height: 150px; overflow-y: auto; box-sizing: border-box;">
                 {% for recurso in lista_recursos %}
                 <label style="display: flex; align-items: center; gap: 10px; font-weight: 500; color: #333; cursor: pointer; font-size: 14px; margin: 0;">
                     <input type="checkbox" name="form_item" value="{{ recurso.nome }}" style="width: 16px; height: 16px; cursor: pointer;">
@@ -58,14 +60,24 @@
             </div>
         </div>
 
-        <!-- Botões de Ação Inferiores -->
-        <div style="display: flex; gap: 15px;">
-            <button type="submit" style="flex: 1; padding: 14px; background: #aa7024; color: white; border: none; border-radius: 6px; font-weight: bold; font-size: 15px; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#aa7024'" onmouseout="this.style.background='#aa7024'">
-                Salvar Tarefa
-            </button>
-            <a href="{{ url_for('listar_atividades') }}" style="flex: 1; padding: 14px; background: #f5f5f5; color: #666; border: 1px solid #e0e0e0; border-radius: 6px; font-weight: 500; font-size: 15px; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; transition: background 0.2s;" onmouseover="this.style.background='#eeeeee'" onmouseout="this.style.background='#f5f5f5'">
-                Limpar / Retornar
-            </a>
+        <!-- Campo 7: Prioridade -->
+        <div class="recurso-grupo">
+            <label for="form_prioridade" class="recurso-label"> Prioridade:</label>
+            <select id="form_prioridade" name="form_prioridade" class="recurso-select">
+                <option value="Baixa">Baixa</option>
+                <option value="Média" selected>Média</option>
+                <option value="Alta">Alta</option>
+                <option value="Urgente">Urgente</option>
+            </select>
+        </div>
+
+        <!-- Botões de Ações -->
+        <div class="recurso-acoes">
+            <!-- CORREÇÃO 2: Alterado type="button" para type="submit" para permitir o envio do formulário -->
+            <button type="submit" class="recurso-btn-salvar"> Salvar Tarefa</button>
+
+            <!-- ADICIONADO: Direcionando o botão cancelar de volta para a lista -->
+            <a href="{{ url_for('listar_recursos') }}" class="recurso-btn-cancelar">Cancelar</a>
         </div>
 
     </form>

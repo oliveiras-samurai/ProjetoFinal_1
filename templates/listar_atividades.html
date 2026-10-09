@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 {% block conteudo %}
 
@@ -19,7 +18,10 @@
         <thead>
             <tr>
                 <th>Tarefa</th>
-                <th>Data de Entrega</th>
+                <th>Data de Abertura</th>
+                <th>Data de Encerramento</th>
+                <th>ID do Responsável</th>
+                <th>Status</th>
                 <th>Nível de Prioridade</th>
                 <th>Recursos Utilizados</th>
                 <th style="text-align: center;">Ação</th>
@@ -29,15 +31,19 @@
             {% for atividade in dados_atividades %}
             <tr>
                 <td style="font-weight: 600;">{{ atividade.nome_atividades }}</td>
-                <td style="color: #666;">{{ atividade.data_atividades }}</td>
+                <td style="color: #666;">{{ atividade.data_abertura }}</td>
+                <td style="color: #666;">{{ atividade.data_encerramento }}</td>
+                <td style="color: #666;">{{ atividade.id_responsavel }}</td>
                 <td>
-                    <span style="background: #f3e5f5; color: #a2631f; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; border: 1px solid #aa5c24;">
-                        {{ atividade.tipo_atividades }}
+                    <!-- Colocado o status dentro de uma badge estilizada que você tinha criado -->
+                    <span style="background: #fdfbfd; color: #a2631f; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: bold; border: 1px solid #aa5c24;">
+                        {{ atividade.status_atividades }}
                     </span>
                 </td>
+                <td style="color: #666;">{{ atividade.prioridade_atividades }}</td>
                 <td style="color: #555;">
-                    {% if atividade.item_atividades %}
-                        {{ atividade.item_atividades | join(', ') }}
+                    {% if atividade.recursos_atividades %}
+                        {{ atividade.recursos_atividades | join(', ') }}
                     {% else %}
                         <span style="color: #999; font-style: italic;">Nenhum</span>
                     {% endif %}
@@ -50,7 +56,8 @@
             </tr>
             {% else %}
             <tr>
-                <td colspan="5" style="padding: 30px; text-align: center; color: #aa6724; font-weight: bold;">
+                <!-- CORREÇÃO: colspan alterado para 8 para ocupar a tabela inteira e centralizado -->
+                <td colspan="8" style="padding: 30px; text-align: center; color: #aa6724; font-weight: bold;">
                     Nenhuma tarefa salva no sistema.
                 </td>
             </tr>
