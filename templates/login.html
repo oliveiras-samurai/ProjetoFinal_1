@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block conteudo %}
+
+<div style="max-width: 500px; margin: 0 auto;">
+    <h1 style="font-size: 28px; font-weight: 700; color: #aa2424; margin-top: 0; margin-bottom: 8px; text-align: center;">Acessar Conta</h1>
+    <p style="color: #666; font-size: 14px; margin-bottom: 30px; text-align: center;">Insira seus dados para entrar no sistema.</p>
+
+    <!-- Formulário estático de login -->
+    <form action="#" method="POST">
+
+        <!-- Caixa Única de Login (Estilo idêntico ao seu layout original) -->
+        <div style="background: #ffffff; border: 1px solid #cbd5e1; border-radius: 12px; padding: 25px; box-sizing: border-box; margin-bottom: 25px;">
+            <h3 style="color: #a2631f; margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                🔑 Identificação
+            </h3>
+
+            <!-- Campo Nome -->
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; color: #a2631f; margin-bottom: 5px; font-size: 14px;">Nome:</label>
+                <input type="text" name="login_nome" placeholder="Digite seu nome completo" required
+                       style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
+            </div>
+
+            <!-- Campo E-mail -->
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; font-weight: bold; color: #aa5c24; margin-bottom: 5px; font-size: 14px;">E-mail:</label>
+                <input type="email" name="login_email" placeholder="exemplo@email.com" required
+                       style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
+            </div>
+
+            <!-- Campo Senha -->
+            <div style="margin-bottom: 5px;">
+                <label style="display: block; font-weight: bold; color: #aa6724; margin-bottom: 5px; font-size: 14px;">Senha:</label>
+                <input type="password" name="login_senha" placeholder="Digite sua senha" required
+                       style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; box-sizing: border-box;">
+            </div>
+        </div>
+
+        <!-- Botão de Entrar -->
+        <div style="text-align: center; margin-bottom: 20px;">
+            <button type="button" style="width: 100%; background-color: #b57c1e; color: white; border: none; padding: 12px 24px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer;">
+                🚀 Entrar no Sistema
+            </button>
+        </div>
+    </form>
+
+    <!-- Linha Divisória -->
+    <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 25px 0;">
+
+    <!-- Link para voltar ao Cadastro -->
+    <div style="text-align: center; margin-bottom: 40px;">
+        <p style="color: #666; font-size: 14px; margin-bottom: 10px;">Ainda não tem cadastro?</p>
+        <a href="{{ url_for('pessoa') }}" style="color: #b57c1e; font-size: 14px; font-weight: bold; text-decoration: none;">
+            Criar uma nova conta
+        </a>
+    </div>
+</div>
+
+{% endblock %}

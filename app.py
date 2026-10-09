@@ -27,7 +27,7 @@ dados_usuario = {
 
 @app.route('/')
 def index():
-   return render_template('index.html')
+   return render_template('cadastro.html')
 
 
 @app.route('/atividades/criar', methods=['GET', 'POST'])
@@ -152,6 +152,11 @@ def excluir_recurso(recurso_id):
    global base_recursos
    base_recursos = [rec for rec in base_recursos if rec.get('id') != recurso_id]
    return redirect(url_for('listar_recursos'))
+
+@app.route('/login')
+def login():
+    return render_template('login.html') # Carrega a sua tela de login
+
 
 
 # Inicialização do servidor web na rede local (porta 5007)
