@@ -1,59 +1,84 @@
-from datetime import time
-
 from flask import flash
 from sqlalchemy import select, func
 from sqlalchemy.exc import SQLAlchemyError
 
-from models import Equipamento, db_session, Servico
+from models import db_session, Servico, Equipamento
+
+
+def select_todos():
+    # Retorna todos os Serviços e a quantidade de equipamentos vinculados a cada um
+    equipamentos_sql = (
+        select(Servico, func.count(Equipamento.id).label('total_equipamentos'))
+        .outerjoin(Equipamento, Equipamento.servico_id == Servico.id)
+        .group_by(Servico.id)
+    )
+
+    return db_session.execute(equipamentos_sql).all()
+
+
+def select_quantidade_total():
+    # Conta o total absoluto de equipamentos no banco
+    equipamentos_sql = select(func.count(Equipamento.id))
+    return db_session.execute(equipamentos_sql).scalar()
+
+
+# 🛅 FUNÇÃO COMPLETA PARA SALVAR A OS (SERVIÇO)
+def salvar_servico(nome, data_abertura, data_encerramento, id_responsavel, status_servico):
+    try:
+        novo_servico = Servico(
+            nome=nome,
+            data_abertura=data_abertura,
+            data_encerramento=data_encerramento,
+            id_responsavel=id_responsavel,
+            status_servico=status_servico
+        )
+
+        db_session.add(novo_servico)
+        db_session.commit()
+
+        flash("Serviço criado com sucesso", category='success')
+        return novo_servico
+
+    except SQLAlchemyError as e:
+        db_session.rollback()
+        print(f'Erro ao salvar Serviço no banco: {e}')
+        flash('Erro ao salvar no banco. Verifique os dados.', category='error')
+    except Exception as e:
+        db_session.rollback()
+        print(f'Erro inesperado no Serviço: {e}')
+        flash('Erro, tente novamente', category='error')
+
+
+# ⚙️ NOVA FUNÇÃO PARA SALVAR APENAS EQUIPAMENTO (Se você tiver um formulário para isso)
+def salvar_equipamento(nome, tipo):
+    try:
+        # Ajuste os campos (ex: nome, tipo) de acordo com as colunas do seu modelo Equipamento
+        novo_equipamento = Equipamento(
+            nome=nome,
+            tipo=tipo
+        )
+
+        db_session.add(novo_equipamento)
+        db_session.commit()
+
+        flash("Equipamento cadastrado com sucesso", category='success')
+        return novo_equipamento
+
+    except SQLAlchemyError as e:
+        db_session.rollback()
+        print(f'Erro ao salvar Equipamento no banco: {e}')
+        flash('Erro ao salvar equipamento.', category='error')
+
+
+def select_um(id_equipamento):
+    # Busca um equipamento específico pelo ID
+    equipamento_sql = select(Equipamento).where(Equipamento.id == id_equipamento)
+    return db_session.execute(equipamento_sql).scalar_one_or_none()
 
 
 def select_todos_equipamentos():
-    # Buscar todos os times no banco
-    # 1 - Montar o select
-    # join(Tabela que eu quero juntar, condição = chave estrangeira igual chave primária)
-    equipamentos_sql = select(Equipamento, Servico).join(Servico, Equipamento.servico_id == Servico.id)
-    # 2 - Executar o select
-    # usar scalars quando tiver somente uma tabela
-    equipamentos = db_session.execute(equipamentos_sql).all()
-
-    return equipamentos
-
-def select_quantidade_total():
-    equipamentos_sql = select(func.count(Equipamento.id))
-    qtd_total = db_session.execute(equipamentos_sql).scalar()
-    return qtd_total
-
-print(select_quantidade_total())
-
-def salvar_equipamento(nome, tipo):
-    try:
-        # cria uma nova pessoa e adiciona na base de dados
-        novos_servicos = Equipamento(nome=nome, tipo=tipo)
-        # Inicializa a sessão do banco de dados
-        db_session.add(novos_servicos)
-        db_session.commit()
-        flash("Equipamento criado com sucesso", category='success')
-        print(f'{novos_servicos}')
-    except SQLAlchemyError as e:
-        db_session.rollback()  # Reverte a transação em caso de erro
-        print(f'Erro ao salvar equipamento no banco: {e}')
-        flash('Erro ao salvar equipamento no banco', category='error')
-    except Exception as e:
-        db_session.rollback()
-        print(f'Erro inesperado', e)
-        flash('Erro, tente novamente', category='error')
-
-def select_um(id_equipamento):
-    equipamento_sql = select(Equipamento).where(Equipamento.id == id_usuario)
-    equipamento = db_session.execute(equipamento_sql).scalar_one_or_none()
-    return equipamento
-
-
-def select_por_servico(id_servico):
-    # trazer jogadores de um time
-    equipamentos_sql = select(Equipamento).where(Equipamento.servico_id == int(id_servico))
-    equipamentos = db_session.execute(equipamentos_sql).scalars().all()
-    return equipamentos
-
-print(select_por_servico(1))
-
+    equipamentos_sql = (
+        select(Equipamento, Servico.nome.label('nome_servico'))
+        .outerjoin(Servico, Equipamento.servico_id == Servico.id)
+    )
+    return db_session.execute(equipamentos_sql).all()
