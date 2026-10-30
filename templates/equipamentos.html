@@ -8,38 +8,44 @@
             <p class="subtitulo">Cadastro de equipamentos para ordens de serviço</p>
         </div>
 
+        {% if not editar %}
         <a href="{{ url_for('novo_equipamento') }}" class="botao">+ Novo Equipamento</a>
+        {% endif %}
     </div>
 
-    {% if request.endpoint == 'novo_equipamento' %}
+    <!-- 1. Ajustado para exibir o painel tanto na criação quanto na edição -->
+    {% if request.endpoint == 'novo_equipamento' or request.endpoint == 'editar_equipamento' %}
     <section class="painel formulario">
-        <h2>Novo Equipamento</h2>
+        <h2>{{ 'Editar Equipamento' if editar else 'Novo Equipamento' }}</h2>
 
-        <form method="POST" action="{{ url_for('novo_equipamento') }}">
+        <!-- 2. Rota dinâmica de envio (POST) dependendo se estamos editando ou criando -->
+        <form method="POST" action="{{ url_for('editar_equipamento', id_equipamento=editar.id) if editar else url_for('novo_equipamento') }}">
             <div class="linha-campos">
-                <!-- Nome do Equipamento -->
+                <!-- Nome do Equipamento com preenchimento automático em caso de edição -->
                 <div class="campo">
-                    <label for="nome">Nome do Equipamento</label>
-                    <input type="text" id="nome" name="nome" required placeholder="Ex: Servidor Dell">
+                    <label for="nome">Nome do Equipamento *</label>
+                    <input type="text" id="nome" name="nome" required placeholder="Ex: Servidor Dell" value="{{ editar.nome if editar else '' }}">
                 </div>
             </div>
 
             <div class="campo campo-cor">
-            <label for="tipo">Tipo de Equipamento</label>
-            <select id="tipo" name="tipo">
-                {% if editar %}
-                <option value="{{ editar.tipo }}" selected>{{ editar.tipo }}</option>
-                {% endif %}
-                <option value="Ferramenta">Ferramenta</option>
-                <option value="Eletrônico">Eletrônico</option>
-                <option value="Maquinário">Maquinário</option>
-                <option value="TI / Redes">TI / Redes</option>
-                <option value="Outros">Outros</option>
-            </select>
+                <label for="tipo">Tipo de Equipamento *</label>
+                <select id="tipo" name="tipo" required>
+                    {% if editar %}
+                    <option value="{{ editar.tipo }}" selected>{{ editar.tipo }}</option>
+                    {% else %}
+                    <option value="">Selecione</option>
+                    {% endif %}
+                    <option value="Ferramenta">Ferramenta</option>
+                    <option value="Eletrônico">Eletrônico</option>
+                    <option value="Maquinário">Maquinário</option>
+                    <option value="TI / Redes">TI / Redes</option>
+                    <option value="Outros">Outros</option>
+                </select>
             </div>
 
             <div class="acoes-form">
-                <button type="submit" class="botao">Cadastrar</button>
+                <button type="submit" class="botao">{{ 'Salvar Alterações' if editar else 'Cadastrar' }}</button>
                 <a href="{{ url_for('listar_equipamentos') }}" class="botao botao-secundario">Cancelar</a>
             </div>
         </form>
@@ -64,8 +70,10 @@
                     <td>{{ item.Equipamento.id }}</td>
                     <td>{{ item.Equipamento.nome }}</td>
                     <td>{{ item.Equipamento.tipo }}</td>
-                    <td>
-                        <a href="{{ url_for('excluir_equipamento', equipamento_id=item.Equipamento.id) }}" class="link-excluir">Excluir</a>
+                    <td class="acoes-col">
+                        <!-- 3. Adicionado o link/botão para a rota de edição ao lado de Excluir -->
+                        <a href="{{ url_for('excluir_equipamento', equipamento_id=item.Equipamento.id) }}" class="link-excluir">🗑️ Excluir</a> /
+                        <a href="{{ url_for('editar_equipamento', id_equipamento=item.Equipamento.id) }}" class="link-editar">🛠️ Editar</a>
                     </td>
                 </tr>
             {% endfor %}

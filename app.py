@@ -357,5 +357,35 @@ def excluir_recurso(recurso_id):
     return redirect(url_for('listar_recursos'))
 
 
+@app.route("/editar_recurso/<int:recurso_id>", methods=["GET", "POST"])
+def editar_recurso(recurso_id):
+    # Buscar o recurso no banco pelo ID
+    recurso = tabela_recurso.select_um_recurso(recurso_id)
+
+    if request.method == "POST":
+        nome = request.form.get("nome")
+        acoes = request.form.get("acoes")
+
+        if not nome:
+            flash('Preencha o nome do recurso', 'error')
+            return redirect(url_for("editar_recurso", recurso_id=recurso_id))
+
+        else:
+            recurso.nome = nome
+            # recurso.acoes = acoes  # Remova ou comente se a coluna não existir no banco
+            db_session.commit()
+            flash("Equipamento alterado com sucesso", category="success")
+            return redirect(url_for("listar_recursos"))
+
+    # ========================================================
+    # SOLUÇÃO DO ERRO (Bloco GET): Executado ao abrir a página
+    # ========================================================
+    # Buscamos a lista completa para preencher a tabela abaixo do formulário
+    lista_recursos = tabela_recurso.select_todos_recursos()
+
+    # IMPORTANTE: Passamos a lista completa e o objeto específico na variável 'editar'
+    return render_template("recursos.html", recursos=lista_recursos, editar=recurso)
+
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5003)

@@ -8,24 +8,28 @@
             <p class="subtitulo">Cadastro de recursos para ordens de serviço</p>
         </div>
 
+        {% if not editar %}
         <a href="{{ url_for('novo_recurso') }}" class="botao">+ Novo Recurso</a>
+        {% endif %}
     </div>
 
-    {% if request.endpoint == 'novo_recurso' %}
+    <!-- 1. Exibe o formulário tanto na criação quanto na edição -->
+    {% if request.endpoint == 'novo_recurso' or request.endpoint == 'editar_recurso' %}
     <section class="painel formulario">
-        <h2>Novo Recurso</h2>
+        <h2>{{ 'Editar Recurso' if editar else 'Novo Recurso' }}</h2>
 
-        <form method="POST" action="{{ url_for('novo_recurso') }}">
+        <!-- CORREÇÃO: Mudado id_recurso para recurso_id para bater com a rota do Flask -->
+        <form method="POST" action="{{ url_for('editar_recurso', recurso_id=editar.id) if editar else url_for('novo_recurso') }}">
             <div class="linha-campos">
-                <!-- Nome do Equipamento -->
+                <!-- Nome do Recurso -->
                 <div class="campo">
-                    <label for="nome">Nome do Recurso</label>
-                    <input type="text" id="nome" name="nome" required placeholder="Ex: Servidor Dell">
+                    <label for="nome">Nome do Recurso *</label>
+                    <input type="text" id="nome" name="nome" required placeholder="Ex: Servidor Dell" value="{{ editar.nome if editar else '' }}">
                 </div>
             </div>
 
             <div class="acoes-form">
-                <button type="submit" class="botao">Cadastrar</button>
+                <button type="submit" class="botao">{{ 'Salvar Alterações' if editar else 'Cadastrar' }}</button>
                 <a href="{{ url_for('listar_recursos') }}" class="botao botao-secundario">Cancelar</a>
             </div>
         </form>
@@ -44,17 +48,17 @@
                 </tr>
             </thead>
             <tbody>
-           {% for item in recursos %}
-            <tr>
-                <!-- CORREÇÃO: Usando .Recursos antes do atributo -->
-                <td>{{ item.Recursos.id }}</td>
-                <td>{{ item.Recursos.nome }}</td>
-                <td>
-                <a href="{{ url_for('excluir_recurso', recurso_id=item.Recursos.id) }}" class="link-excluir">Excluir</a>
-            </td>
-            </tr>
-        {% endfor %}
-
+            {% for item in recursos %}
+                <tr>
+                    <td>{{ item.Recursos.id }}</td>
+                    <td>{{ item.Recursos.nome }}</td>
+                    <td class="acoes-col">
+                        <a href="{{ url_for('excluir_recurso', recurso_id=item.Recursos.id) }}" class="link-excluir">🗑️ Excluir</a> /
+                        <!-- CORREÇÃO: Mudado id_recurso para recurso_id aqui também -->
+                        <a href="{{ url_for('editar_recurso', recurso_id=item.Recursos.id) }}" class="link-editar">🛠️ Editar</a>
+                    </td>
+                </tr>
+            {% endfor %}
             </tbody>
         </table>
         {% else %}

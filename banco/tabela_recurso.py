@@ -82,3 +82,7 @@ def select_todos_recursos():
         .outerjoin(Servico, Recursos.servico_id == Servico.id)
     )
     return db_session.execute(recursos_sql).all()
+
+
+
+
