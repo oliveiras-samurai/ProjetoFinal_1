@@ -22,47 +22,9 @@
             <div class="cartao-valor">{{ total_recursos }}</div>
             <div class="cartao-label">Recursos</div>
         </div>
-        <div class="cartao">
-            <div class="cartao-valor">{{ total_movimentacoes }}</div>
-            <div class="cartao-label">Movimentações</div>
-        </div>
     </div>
 
     <div class="grid-dashboard">
-        <section class="painel">
-            <h2>Últimas Ordens de Serviço</h2>
-            {% if ultimos_servicos %}
-            <table>
-                <thead>
-                    <tr><th>OS</th><th>Responsável</th><th>Status</th></tr>
-                </thead>
-                <tbody>
-                {% for s in ultimos_servicos %}
-                    <tr><td>{{ s.nome }}</td><td>{{ s.id_responsavel }}</td><td>{{ s.status_servico }}</td></tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-                <p class="vazio">Nenhuma OS registrada.</p>
-            {% endif %}
-        </section>
 
-        <section class="painel">
-            <h2>Últimas Movimentações</h2>
-            {% if ultimas_movimentacoes %}
-            <table>
-                <thead>
-                    <tr><th>Tipo</th><th>Item</th><th>Qtd</th></tr>
-                </thead>
-                <tbody>
-                {% for m in ultimas_movimentacoes %}
-                    <tr><td>{{ m.tipo }}</td><td>{{ m.item_nome }}</td><td>{{ m.quantidade }}</td></tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            {% else %}
-                <p class="vazio">Nenhuma movimentação registrada.</p>
-            {% endif %}
-        </section>
     </div>
 {% endblock %}

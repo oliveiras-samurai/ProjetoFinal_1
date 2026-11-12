@@ -54,7 +54,6 @@
                     <td>{{ item.Recursos.nome }}</td>
                     <td class="acoes-col">
                         <a href="{{ url_for('excluir_recurso', recurso_id=item.Recursos.id) }}" class="link-excluir">🗑️ Excluir</a> /
-                        <!-- CORREÇÃO: Mudado id_recurso para recurso_id aqui também -->
                         <a href="{{ url_for('editar_recurso', recurso_id=item.Recursos.id) }}" class="link-editar">🛠️ Editar</a>
                     </td>
                 </tr>

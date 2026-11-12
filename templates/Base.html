@@ -8,8 +8,10 @@
 </head>
 <body>
     <div class="layout">
+        <!-- MENU VERTICAL -->
+        {% if current_user.id %}
         <nav class="menu-lateral">
-            <div class="menu-titulo">🏆 Plano Corp | Gestão de Serviços</div>
+            <div class="menu-titulo">🏆 FixTrack Corporation | Gestão de Serviços</div>
             <ul>
                 <li>
                     <a href="{{ url_for('dashboard') }}" class="{{ 'ativo' if request.endpoint == 'dashboard' else '' }}">
@@ -37,12 +39,13 @@
                     </a>
                 </li>
                 <li>
-                    <a href="{{ url_for('listar_movimentacoes') }}" class="{{ 'ativo' if request.endpoint and 'movimentacao' in request.endpoint else '' }}">
-                        <span class="icone">🔄️</span> Movimentações
+                    <a href="{{ url_for('logout') }}" class="{{ 'ativo' if request.endpoint and 'movimentacao' in request.endpoint else '' }}">
+                        <span class="icone">🚪</span> Sair [{{ current_user.nome }}]
                     </a>
                 </li>
             </ul>
         </nav>
+{% endif %}
 
         <main class="conteudo">
             {% with mensagens = get_flashed_messages(with_categories=true) %}
