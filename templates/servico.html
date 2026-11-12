@@ -56,7 +56,7 @@
                 <div style="background: #fdfbfd; border: 1px solid #cbd5e1; border-radius: 6px; padding: 15px; display: flex; flex-direction: column; gap: 10px; max-height: 150px; overflow-y: auto;">
                     {% for item in lista_equipamentos %}
                     <label style="display: flex; align-items: center; gap: 10px; font-weight: 500; color: #333; cursor: pointer; font-size: 14px; margin: 0;">
-                    <input type="checkbox" id="equipamento" name="equipamento" value="{{item.nome }}" style="width: 16px; height: 16px; cursor: pointer;">
+                    <input type="radio" id="equipamento" name="equipamento" value="{{item.nome }}" style="width: 16px; height: 16px; cursor: pointer;">
                         <span>{{ item.Equipamento.nome }} <small style="color: #666;">({{ item.Equipamento.tipo }})</small></span>
                     </label>
                     {% else %}
