@@ -106,6 +106,7 @@
         </div>
 
         <ul>
+            <li><a href="{{ url_for('inicio') }}" class="{{ 'ativo' if request.endpoint == 'inicio' else '' }}">🚪 Tela Inicial</a></li>
             <li><a href="{{ url_for('dashboard') }}" class="{{ 'ativo' if request.endpoint == 'dashboard' else '' }}">📊 Dashboard</a></li>
             <li><a href="{{ url_for('listar_servicos') }}" class="{{ 'ativo' if 'servico' in (request.endpoint or '') else '' }}">🛠️ Serviços</a></li>
             <li><a href="{{ url_for('listar_usuarios') }}" class="{{ 'ativo' if 'usuario' in (request.endpoint or '') else '' }}">👥 Usuários</a></li>

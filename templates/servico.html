@@ -17,10 +17,25 @@
         <h2>{{ 'Editar OS' if editar else 'Nova OS' }}</h2>
         <form method="POST" action="{{ url_for('editar_servico', id_servico=editar.id) if editar else url_for('novo_servico') }}">
 
-            <div class="campo" style="margin-bottom: 18px;">
-                <label for="id_responsavel">Responsável pela OS</label>
-                <input type="text" id="id_responsavel" name="id_responsavel" value="{{ editar.id_responsavel if editar else '' }}">
+                        <div style="margin-bottom: 24px;">
+                <label for="id_responsavel" style="display: block; font-weight: bold; color: #2b6cb0; margin-bottom: 12px; font-size: 15px;">
+                    Responsável pela OS
+                </label>
+                <select id="id_responsavel" name="id_responsavel">
+                    <option value="">Selecione um usuário cadastrado</option>
+                    {% for usuario in lista_usuarios %}
+                        {% set nome_formatado = usuario.nome.capitalize() if usuario.nome else '' %}
+                        {% if editar and editar.id_responsavel == nome_formatado %}
+                            <option value="{{ nome_formatado }}" selected>{{ nome_formatado }}</option>
+                        {% else %}
+                            <option value="{{ nome_formatado }}">{{ nome_formatado }}</option>
+                        {% endif %}
+                    {% else %}
+                        <option value="" disabled>Nenhum usuário cadastrado para seleção</option>
+                    {% endfor %}
+                </select>
             </div>
+
 
             <div class="campo" style="margin-bottom: 18px;">
                 <label for="nome">Título / Nome da OS</label>
@@ -46,24 +61,45 @@
 
             <div class="campo campo-cor" style="margin-bottom: 24px;">
                 <label for="status_servico">Status da OS</label>
-                <select id="status_servico" name="status_servico" value="{{ editar.status_servico if editar else ''}}">
-                    <option value="Não iniciada"> {{ 'selected' if editar and editar.status_servico == 'Não iniciada' else '' }}Não iniciada</option>
-                    <option value="Em espera"> {{ 'selected' if editar and editar.status_servico == 'Em espera' else '' }}Em espera</option>
-                    <option value="Iniciada"> {{ 'selected' if editar and editar.status_servico == 'Iniciada' else '' }}Iniciada</option>
-                    <option value="Finalizada"> {{ 'selected' if editar and editar.status_servico == 'Finalizada' else '' }}Finalizada</option>
+                <select id="status_servico" name="status_servico">
+                    {% if editar and editar.status_servico == 'Não iniciada' %}
+                        <option value="Não iniciada" selected>Não iniciada</option>
+                    {% else %}
+                        <option value="Não iniciada">Não iniciada</option>
+                    {% endif %}
+
+                    {% if editar and editar.status_servico == 'Em espera' %}
+                        <option value="Em espera" selected>Em espera</option>
+                    {% else %}
+                        <option value="Em espera">Em espera</option>
+                    {% endif %}
+
+                    {% if editar and editar.status_servico == 'Iniciada' %}
+                        <option value="Iniciada" selected>Iniciada</option>
+                    {% else %}
+                        <option value="Iniciada">Iniciada</option>
+                    {% endif %}
+
+                    {% if editar and editar.status_servico == 'Finalizada' %}
+                        <option value="Finalizada" selected>Finalizada</option>
+                    {% else %}
+                        <option value="Finalizada">Finalizada</option>
+                    {% endif %}
                 </select>
             </div>
 
-            <div style="margin-bottom: 24px;">
+
+                        <div style="margin-bottom: 24px;">
                 <label for="equipamento" style="display: block; font-weight: bold; color: #2b6cb0; margin-bottom: 12px; font-size: 15px;">
                     Quais equipamentos serão utilizados?
                 </label>
-                <select id="equipamento" name="equipamento" value="{{ editar.equipamento if editar else ''}}">
+                <select id="equipamento" name="equipamento">
                     <option value="">Selecione um equipamento cadastrado</option>
                     {% for item in lista_equipamentos %}
-                        <option value="{{ item.Equipamento.nome }}"> {{ 'selected' if editar and editar.equipamento == item.Equipamento.nome else '' }}
-                            {{ item.Equipamento.nome }} ({{ item.Equipamento.tipo }})
-                        </option>
+                       <option value="{{ item.nome }}" {% if editar and editar.equipamento == item.nome %}selected{% endif %}>
+                            {{ item.nome }} ({{ item.tipo }})
+                       </option>
+
                     {% else %}
                         <option value="" disabled>Nenhum equipamento cadastrado para seleção</option>
                     {% endfor %}
@@ -74,11 +110,11 @@
                 <label for="recurso" style="display: block; font-weight: bold; color: #2b6cb0; margin-bottom: 12px; font-size: 15px;">
                     Quais recursos serão utilizados?
                 </label>
-                <select id="recurso" name="recurso" value="{{ editar.recurso if editar else ''}}">
+                <select id="recurso" name="recurso">
                     <option value="">Selecione um recurso cadastrado</option>
                     {% for item in lista_recursos %}
-                        <option value="{{ item.Recursos.nome }}"> {{ 'selected' if editar and editar.recurso == item.Recursos.nome else '' }}
-                            {{ item.Recursos.nome }}
+                        <option value="{{ item.nome }}" {% if editar and editar.recurso == item.nome %}selected{% endif %}>
+                            {{ item.nome }}
                         </option>
                     {% else %}
                         <option value="" disabled>Nenhum recurso cadastrado para seleção</option>
@@ -86,14 +122,31 @@
                 </select>
             </div>
 
+
             <div class="campo campo-cor" style="margin-bottom: 24px;">
                 <label for="prioridade">Prioridade</label>
-                <select id="prioridade" name="prioridade" value="{{ editar.prioridade if editar else ''}}">
-                    <option value="Baixa"> {{ 'selected' if editar and editar.prioridade == 'Baixa' else '' }}Baixa</option>
-                    <option value="Média"> {{ 'selected' if editar and editar.prioridade == 'Média' else '' }}Média</option>
-                    <option value="Alta"> {{ 'selected' if editar and editar.prioridade == 'Alta' else '' }}Alta</option>
+                <select id="prioridade" name="prioridade">
+                    {% if editar and editar.prioridade == 'Baixa' %}
+                        <option value="Baixa" selected>Baixa</option>
+                    {% else %}
+                        <option value="Baixa">Baixa</option>
+                    {% endif %}
+
+                    {% if editar and editar.prioridade == 'Média' %}
+                        <option value="Média" selected>Média</option>
+                    {% else %}
+                        <option value="Média">Média</option>
+                    {% endif %}
+
+                    {% if editar and editar.prioridade == 'Alta' %}
+                        <option value="Alta" selected>Alta</option>
+                    {% else %}
+                        <option value="Alta">Alta</option>
+                    {% endif %}
                 </select>
             </div>
+
+
 
             <div class="acoes-form">
                 <button type="submit" class="botao">{{ 'Salvar Alterações' if editar else 'Cadastrar' }}</button>

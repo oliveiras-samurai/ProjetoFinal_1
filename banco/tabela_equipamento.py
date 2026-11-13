@@ -22,7 +22,6 @@ def select_quantidade_total():
     return db_session.execute(equipamentos_sql).scalar()
 
 
-# 🛅 FUNÇÃO COMPLETA PARA SALVAR A OS (SERVIÇO)
 def salvar_servico(nome, data_abertura, data_encerramento, id_responsavel, status_servico):
     try:
         novo_servico = Servico(
@@ -48,11 +47,8 @@ def salvar_servico(nome, data_abertura, data_encerramento, id_responsavel, statu
         print(f'Erro inesperado no Serviço: {e}')
         flash('Erro, tente novamente', category='error')
 
-
-# ⚙️ NOVA FUNÇÃO PARA SALVAR APENAS EQUIPAMENTO (Se você tiver um formulário para isso)
 def salvar_equipamento(nome, tipo):
     try:
-        # Ajuste os campos (ex: nome, tipo) de acordo com as colunas do seu modelo Equipamento
         novo_equipamento = Equipamento(
             nome=nome,
             tipo=tipo

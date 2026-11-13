@@ -4,23 +4,29 @@ from flask import Flask, render_template, request, redirect, url_for, flash, g
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from banco import tabela_ordem_servico, tabela_usuario, tabela_equipamento, tabela_recurso
-from models import db_session, Usuario, Pessoa, Servico, Equipamento,Recursos
+from models import db_session, Usuario, Pessoa, Servico, Equipamento, Recursos
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+
 app = Flask(__name__)
 app.secret_key = "chave-secreta-projeto-final-2026"
+
 # Configuração Flask_Login
 login_manager = LoginManager(app)
-login_manager.login_view= "login"
+login_manager.login_view = "login"
 login_manager.login_message = "Faça login para acessar"
+
 
 # Prevenir gargalo "too many connections"
 @app.teardown_appcontext
 def shutdown_session(exception=None):
     db_session.remove()
+
+
 # Carregar informações do usuário logado
 @login_manager.user_loader
 def load_user(user_id):
     return db_session.get(Pessoa, int(user_id))
+
 
 # Interface de autenticação
 @app.route('/login', methods=["GET", "POST"])
@@ -45,8 +51,9 @@ def login():
 
     return render_template(
         "login.html",
-        registro= request.args.get("registro")
+        registro=request.args.get("registro")
     )
+
 
 @app.route('/logout')
 @login_required
@@ -54,12 +61,13 @@ def logout():
     logout_user()
     return redirect(url_for("login"))
 
+
 @app.route('/registro', methods=["GET", "POST"])
 def registro():
     if request.method == "POST":
-        nome = request.form.get("nome","").strip()
-        email = request.form.get("email","").strip()
-        senha = request.form.get("senha","").strip()
+        nome = request.form.get("nome", "").strip()
+        email = request.form.get("email", "").strip()
+        senha = request.form.get("senha", "").strip()
 
         if not nome and not email and not senha:
             flash('Preencher todos os campos', 'error')
@@ -91,8 +99,12 @@ def registro():
     return render_template("login.html")
 
 
-
 @app.route("/")
+
+def inicio():
+    return render_template('inicio.html')
+
+@app.route("/dashboard")
 @login_required
 def dashboard():
     servicos = tabela_ordem_servico.select_quantidade_total()
@@ -108,9 +120,11 @@ def dashboard():
         total_recursos=recursos,
     )
 
+
 # --- USUÁRIOS ---
 def get_usuarios():
     return db_session.execute(select(Usuario, Servico).outerjoin(Servico, Usuario.servico_id == Servico.id)).all()
+
 
 @app.route('/usuarios')
 @login_required
@@ -135,7 +149,6 @@ def novo_usuario():
         email = request.form.get("email")
         data_nascimento = request.form.get("data_nascimento")
 
-        # Verifica se foi digitado
         if not nome:
             flash('Preencha o nome do jogador', 'error')
             return render_template('usuarios.html')
@@ -149,20 +162,16 @@ def novo_usuario():
             flash('Preencha a data', 'error')
             return render_template('usuarios.html')
 
-        # SALVAR NO BANCO DE DADOS:
         tabela_usuario.salvar(nome=nome, telefone=telefone, email=email, data_nascimento=data_nascimento)
-
         return redirect(url_for("listar_usuarios"))
 
     usuarios = tabela_usuario.select_todos()
-    print(usuarios)
     return render_template("usuarios.html", usuarios=usuarios)
 
 
 @app.route("/usuarios/<id_usuario>", methods=["GET", "POST"])
 @login_required
 def editar_usuario(id_usuario):
-    # Buscar o jogador no banco
     usuario = tabela_usuario.select_um(id_usuario)
 
     if request.method == "POST":
@@ -171,7 +180,6 @@ def editar_usuario(id_usuario):
         email = request.form.get("email")
         data_nascimento = request.form.get("data_nascimento")
 
-        # Verifica se foi digitado
         if not nome:
             flash('Preencha o nome do jogador', 'error')
         elif not telefone:
@@ -186,14 +194,13 @@ def editar_usuario(id_usuario):
             usuario.email = email
             usuario.data_nascimento = data_nascimento
             db_session.commit()
-
             flash("Usuário alterado com sucesso", category="success")
 
         return redirect(url_for("listar_usuarios"))
 
-    # Carregar as informações
     usuarios = tabela_usuario.select_todos()
     return render_template("usuarios.html", usuarios=usuarios, editar=usuario)
+
 
 @app.route("/usuarios/excluir/<usuario_id>", methods=["GET", "POST"])
 @login_required
@@ -204,8 +211,7 @@ def excluir_usuario(usuario_id):
         db_session.delete(usuario)
         db_session.commit()
     return redirect(url_for('listar_usuarios'))
-
-
+# --- SERVIÇOS ---
 @app.route("/servicos")
 @login_required
 def listar_servicos():
@@ -215,43 +221,22 @@ def listar_servicos():
 
 @app.route("/servicos/novo", methods=["GET", "POST"])
 @login_required
-def novo_servico(usuarios_ids=None):
+def novo_servico(id_responsavel=None):
     if request.method == "POST":
         nome = request.form.get("nome", "").strip()
         data_abertura = request.form.get("data_abertura")
         data_encerramento = request.form.get("data_encerramento")
         id_responsavel = request.form.get("id_responsavel")
         status_servico = request.form.get("status_servico")
-        equipamento = request.form.getlist("equipamentos_selecionados")
+        equipamento = request.form.get("equipamento")
         recurso = request.form.get("recurso")
         prioridade = request.form.get("prioridade")
 
         if not nome:
             flash('Preencha o nome', 'error')
             return redirect(url_for('novo_servico'))
-        if not data_abertura:
-            flash('Preencha a data de abertura', 'error')
-            return redirect(url_for('novo_servico'))
-        if not data_encerramento:
-            flash('Preencha a data de encerramento', 'error')
-            return redirect(url_for('novo_servico'))
-        if not id_responsavel:
-            flash('Preencha o responsável', 'error')
-            return redirect(url_for('novo_servico'))
-        if not status_servico:
-            flash('Preencha o status', 'error')
-            return redirect(url_for('novo_servico'))
-        if not equipamento:
-            flash('Preencha o equipamento', 'error')
-            return redirect(url_for('novo_servico'))
-        if not recurso:
-            flash('Preencha o recurso', 'error')
-            return redirect(url_for('novo_servico'))
-        if not prioridade:
-            flash('Preencha o prioridade', 'error')
-            return redirect(url_for('novo_servico'))
 
-        servico = tabela_ordem_servico.salvar(
+        tabela_ordem_servico.salvar(
             nome=nome,
             data_abertura=data_abertura,
             data_encerramento=data_encerramento,
@@ -261,34 +246,25 @@ def novo_servico(usuarios_ids=None):
             recurso=recurso,
             prioridade=prioridade
         )
-
-        if usuarios_ids and servico:
-            for usuario_id in usuarios_ids:
-                usuario = tabela_usuario.select_um(usuario_id)
-                if usuario:
-                    usuario.servico_id = servico.id
-                    db_session.add(usuario)
-            db_session.commit()
-
-        return redirect(url_for('listar_servicos'))
+        return redirect(url_for("listar_servicos"))
 
     servicos = tabela_ordem_servico.select_todos()
-    usuarios = tabela_usuario.select_todos()
-    lista_equipamento = tabela_equipamento.select_todos_equipamentos()
-    lista_recurso = tabela_recurso.select_todos_recursos()
+    equipamentos = db_session.execute(select(Equipamento)).scalars().all()
+    recursos = db_session.execute(select(Recursos)).scalars().all()
+    usuarios = db_session.execute(select(Usuario)).scalars().all()
 
     return render_template(
         "servico.html",
         servicos=servicos,
-        usuarios=usuarios,
-        lista_equipamentos=lista_equipamento,
-        lista_recursos=lista_recurso,
+        lista_equipamentos=equipamentos,
+        lista_recursos=recursos,
+        lista_usuarios=usuarios,
     )
+
 
 @app.route("/servicos/<id_servico>", methods=["GET", "POST"])
 @login_required
-def editar_servico(id_servico):
-    # Buscar o jogador no banco
+def editar_servico(id_servico, id_responsavel=None):
     servico = tabela_ordem_servico.select_um(id_servico)
 
     if request.method == "POST":
@@ -297,196 +273,163 @@ def editar_servico(id_servico):
         data_encerramento = request.form.get("data_encerramento")
         id_responsavel = request.form.get("id_responsavel")
         status_servico = request.form.get("status_servico")
-        equipamento = request.form.getlist("equipamentos_selecionados")
+        equipamento = request.form.get("equipamento")
         recurso = request.form.get("recurso")
         prioridade = request.form.get("prioridade")
 
         if not nome:
             flash('Preencha o nome', 'error')
-        elif not data_abertura:
-            flash('Preencha a data de abertura', 'error')
-        elif not data_encerramento:
-            flash('Preencha a data de encerramento', 'error')
-        elif not id_responsavel:
-            flash('Preencha o responsável', 'error')
-        elif not status_servico:
-            flash('Preencha o status', 'error')
-        elif not equipamento:
-            flash('Preencha o equipamento', 'error')
-        elif not recurso:
-            flash('Preencha o recurso', 'error')
-        elif not prioridade:
-            flash('Preencha a prioridade', 'error')
-        else:
-            servico.nome = nome
-            servico.data_abertura = data_abertura
-            servico.data_encerramento = data_encerramento
-            servico.id_responsavel = id_responsavel
-            servico.status_servico = status_servico
-            servico.equipamento = equipamento
-            servico.recurso = recurso
-            servico.prioridade = prioridade
-            db_session.commit()
+            return redirect(url_for('editar_servico', id_servico=id_servico))
 
-            flash("Serviço alterado com sucesso", category="success")
+        servico.nome = nome
+        servico.id_responsavel = id_responsavel
+        servico.status_servico = status_servico
+        servico.equipamento = equipamento if equipamento else "Nenhum"
+        servico.recurso = recurso if recurso else "Nenhum"
+        servico.prioridade = prioridade
 
+        if data_abertura:
+            servico.data_abertura = datetime.strptime(data_abertura, '%Y-%m-%dT%H:%M')
+        if data_encerramento:
+            servico.data_encerramento = datetime.strptime(data_encerramento, '%Y-%m-%dT%H:%M')
+
+        db_session.commit()
+        flash("Serviço alterado com sucesso", category="success")
         return redirect(url_for("listar_servicos"))
 
-    # Carregar as informações
     servicos = tabela_ordem_servico.select_todos()
-    return render_template("servico.html", servicos=servicos, editar=servico)
+    equipamentos = db_session.execute(select(Equipamento)).scalars().all()
+    recursos = db_session.execute(select(Recursos)).scalars().all()
+    usuarios = db_session.execute(select(Usuario)).scalars().all()
 
-
-@app.route("/servico/<id_servico>")
-@login_required
-def detalhes_servico(id_servico):
-    servicos = tabela_ordem_servico.select_um(int(id_servico))
-    return render_template("time_detalhes.html", servicos=servicos)
+    return render_template(
+        "servico.html",
+        servicos=servicos,
+        editar=servico,
+        lista_equipamentos=equipamentos,
+        lista_recursos=recursos,
+        lista_usuarios=usuarios,
+    )
 
 
 @app.route("/servicos/excluir/<servico_id>", methods=["GET", "POST"])
 @login_required
 def excluir_servico(servico_id):
-    servico_sql = select(Servico).where(Servico.id == servico_id)
-    servico = db_session.execute(servico_sql).scalar_one_or_none()
+    servico = tabela_ordem_servico.select_um(servico_id)
     if servico:
         db_session.delete(servico)
         db_session.commit()
+        flash("Serviço excluído com sucesso", category="success")
     return redirect(url_for('listar_servicos'))
 
 
-@app.route('/equipamentos')
+# --- EQUIPAMENTOS ---
+@app.route("/equipamentos")
 @login_required
 def listar_equipamentos():
-    lista_equipamentos = tabela_equipamento.select_todos_equipamentos()
-    return render_template('equipamentos.html', equipamentos=lista_equipamentos)
+    equipamentos = tabela_equipamento.select_todos_equipamentos()
+    return render_template("equipamentos.html", equipamentos=equipamentos)
 
 
 @app.route("/equipamentos/novo", methods=["GET", "POST"])
 @login_required
 def novo_equipamento():
     if request.method == "POST":
-        nome = request.form.get("nome")
-        tipo = request.form.get("tipo")
+        nome = request.form.get("nome", "").strip()
+        tipo = request.form.get("tipo", "").strip()
 
         if not nome:
             flash('Preencha o nome do equipamento', 'error')
             return redirect(url_for('novo_equipamento'))
-        if not tipo:
-            flash('Preencha o tipo do equipamento', 'error')
-            return redirect(url_for('novo_equipamento'))
 
         tabela_equipamento.salvar_equipamento(nome=nome, tipo=tipo)
-        return redirect(url_for('listar_equipamentos'))
+        return redirect(url_for("listar_equipamentos"))
 
     equipamentos = tabela_equipamento.select_todos_equipamentos()
-    servicos = tabela_ordem_servico.select_todos()
-    return render_template("equipamentos.html", equipamentos=equipamentos, servicos=servicos)
+    return render_template("equipamentos.html", equipamentos=equipamentos)
+
 
 @app.route("/equipamentos/<id_equipamento>", methods=["GET", "POST"])
 @login_required
 def editar_equipamento(id_equipamento):
-    # Buscar o jogador no banco
     equipamento = tabela_equipamento.select_um(id_equipamento)
 
     if request.method == "POST":
-        nome = request.form.get("nome")
-        tipo = request.form.get("tipo")
-
-        if not nome:
-            flash('Preencha o nome do equipamento', 'error')
-        elif not tipo:
-            flash('Preencha o tipo do equipamento', 'error')
-        else:
-            equipamento.nome = nome
-            equipamento.tipo = tipo
-            db_session.commit()
-
-            flash("Equipamento alterado com sucesso", category="success")
-
+        equipamento.nome = request.form.get("nome", "").strip()
+        equipamento.tipo = request.form.get("tipo", "").strip()
+        db_session.commit()
+        flash("Equipamento alterado com sucesso", category="success")
         return redirect(url_for("listar_equipamentos"))
-    return render_template("equipamentos.html", equipamentos=tabela_equipamento.select_todos_equipamentos(), editar=equipamento)
 
-        # Carregar as informações
-    equipamentos = tabela_equipamento.select_todos()
+    equipamentos = tabela_equipamento.select_todos_equipamentos()
     return render_template("equipamentos.html", equipamentos=equipamentos, editar=equipamento)
 
 
 @app.route("/equipamentos/excluir/<equipamento_id>", methods=["GET", "POST"])
 @login_required
 def excluir_equipamento(equipamento_id):
-    equipamento_sql = select(Equipamento).where(Equipamento.id == equipamento_id)
-    equipamento = db_session.execute(equipamento_sql).scalar_one_or_none()
+    equipamento = tabela_equipamento.select_um(equipamento_id)
     if equipamento:
         db_session.delete(equipamento)
         db_session.commit()
+        flash("Equipamento excluído com sucesso", category="success")
     return redirect(url_for('listar_equipamentos'))
 
 
-@app.route('/recursos')
+# --- RECURSOS ---
+@app.route("/recursos")
 @login_required
 def listar_recursos():
-    lista_recursos = tabela_recurso.select_todos_recursos()
-    return render_template('recursos.html', recursos=lista_recursos)
+    recursos = db_session.execute(select(Recursos)).all()
+    return render_template("recursos.html", recursos=recursos)
 
 
 @app.route("/recursos/novo", methods=["GET", "POST"])
 @login_required
-def novo_recurso(servicos=None):
+def novo_recurso():
     if request.method == "POST":
-        nome = request.form.get("nome")
+        nome = request.form.get("nome", "").strip()
 
         if not nome:
             flash('Preencha o nome do recurso', 'error')
             return redirect(url_for('novo_recurso'))
 
-        tabela_recurso.salvar_recurso(nome=nome)
-        return redirect(url_for('listar_recursos'))
+        novo = Recursos(nome=nome)
+        db_session.add(novo)
+        db_session.commit()
+        flash("Recurso cadastrado com sucesso", category="success")
+        return redirect(url_for("listar_recursos"))
 
-    recursos = tabela_recurso.select_todos_recursos()
-    servicos = tabela_ordem_servico.select_todos()
-    return render_template("recursos.html", recursos=recursos, servicos=servicos)
+    recursos = db_session.execute(select(Recursos)).all()
+    return render_template("recursos.html", recursos=recursos)
 
-@app.route('/excluir_recurso/<int:recurso_id>')
+
+@app.route("/recursos/<recurso_id>", methods=["GET", "POST"])
+@login_required
+def editar_recurso(recurso_id):
+    recurso = db_session.execute(select(Recursos).where(Recursos.id == recurso_id)).scalar_one_or_none()
+
+    if request.method == "POST":
+        recurso.nome = request.form.get("nome", "").strip()
+        db_session.commit()
+        flash("Recurso alterado com sucesso", category="success")
+        return redirect(url_for("listar_recursos"))
+
+    recursos = db_session.execute(select(Recursos)).all()
+    return render_template("recursos.html", recursos=recursos, editar=recurso)
+
+
+@app.route("/recursos/excluir/<recurso_id>", methods=["GET", "POST"])
 @login_required
 def excluir_recurso(recurso_id):
-    recurso_sql = select(Recursos).where(Recursos.id == recurso_id)
-    recurso = db_session.execute(recurso_sql).scalar_one_or_none()
+    recurso = db_session.execute(select(Recursos).where(Recursos.id == recurso_id)).scalar_one_or_none()
     if recurso:
         db_session.delete(recurso)
         db_session.commit()
+        flash("Recurso excluído com sucesso", category="success")
     return redirect(url_for('listar_recursos'))
 
-@app.route("/editar_recurso/<int:recurso_id>", methods=["GET", "POST"])
-@login_required
-def editar_recurso(recurso_id):
-    # Buscar o recurso no banco pelo ID
-    recurso = tabela_recurso.select_um_recurso(recurso_id)
-
-    if request.method == "POST":
-        nome = request.form.get("nome")
-        acoes = request.form.get("acoes")
-
-        if not nome:
-            flash('Preencha o nome do recurso', 'error')
-            return redirect(url_for("editar_recurso", recurso_id=recurso_id))
-
-        else:
-            recurso.nome = nome
-            # recurso.acoes = acoes  # Remova ou comente se a coluna não existir no banco
-            db_session.commit()
-            flash("Equipamento alterado com sucesso", category="success")
-            return redirect(url_for("listar_recursos"))
-
-    # ========================================================
-    # SOLUÇÃO DO ERRO (Bloco GET): Executado ao abrir a página
-    # ========================================================
-    # Buscamos a lista completa para preencher a tabela abaixo do formulário
-    lista_recursos = tabela_recurso.select_todos_recursos()
-
-    # IMPORTANTE: Passamos a lista completa e o objeto específico na variável 'editar'
-    return render_template("recursos.html", recursos=lista_recursos, editar=recurso)
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5003)
+    app.run(debug=True)
