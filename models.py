@@ -34,6 +34,7 @@ class Servico(Base):
     id_responsavel = Column(String(100), nullable=False)
     status_servico = Column(String(50), nullable=False)
     equipamento = Column(String(50), nullable=False)
+    recurso = Column(String(50), nullable=False)
     prioridade = Column(String(50), nullable=False)
 
 class Equipamento(Base):

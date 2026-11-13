@@ -3,64 +3,144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block titulo %}Serviço{% endblock %} - Gestão de Serviços</title>
-    <link rel="stylesheet" href="/static/style_projeto_final.css">
+    <title>{% block titulo %}FixTrack{% endblock %}</title>
+    <style>
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: "Segoe UI", Roboto, Arial, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.5; }
+        .layout { display: flex; min-height: 100vh; }
+
+        /* MENU LATERAL */
+        .menu-lateral { width: 250px; background: #fff; border-right: 1px solid #e2e8f0; padding: 24px 14px; display: flex; flex-direction: column; flex-shrink: 0; }
+
+        /* CABEÇALHO DA MARCA NO MENU */
+        .menu-titulo { display: flex; align-items: center; gap: 12px; padding: 0 8px 20px 8px; border-bottom: 1px solid #e2e8f0; margin-bottom: 16px; }
+        .marca-icone { width: 38px; height: 38px; background: #eef2ff; color: #4f46e5; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+        .marca-texto { display: flex; flex-direction: column; line-height: 1.2; }
+        .marca-nome { font-size: 1.25rem; font-weight: 800; color: #4f46e5; letter-spacing: -0.02em; }
+        .marca-sub { font-size: 0.72rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+
+        /* LINKS DO MENU */
+        .menu-lateral ul { list-style: none; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+        .menu-lateral a { display: flex; align-items: center; gap: 10px; color: #475569; text-decoration: none; padding: 10px 14px; border-radius: 8px; font-weight: 500; transition: 0.2s; }
+        .menu-lateral a:hover, .menu-lateral a.ativo { background: #eef2ff; color: #4f46e5; font-weight: 600; }
+
+        /* PERFIL E SAIR */
+        .menu-perfil { margin-top: auto; padding-top: 14px; border-top: 1px solid #e2e8f0; }
+        .perfil-card { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #f8fafc; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; }
+        .perfil-info-grupo { display: flex; align-items: center; gap: 8px; min-width: 0; }
+        .perfil-avatar { width: 34px; height: 34px; border-radius: 50%; background: #4f46e5; color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .perfil-dados { display: flex; flex-direction: column; min-width: 0; }
+        .perfil-nome { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .perfil-cargo { font-size: 0.72rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .menu-lateral a.botao-sair { padding: 6px 10px; background: #fef2f2; color: #dc2626; font-size: 0.8rem; font-weight: 600; border-radius: 6px; }
+        .menu-lateral a.botao-sair:hover { background: #dc2626; color: #fff; }
+
+        /* CONTEÚDO E PAINÉIS */
+        .conteudo { flex: 1; padding: 32px 40px; max-width: 1150px; }
+        .cabecalho-pagina { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        h1 { font-size: 1.6rem; color: #0f172a; }
+        h2 { font-size: 1.15rem; margin-bottom: 16px; color: #1e293b; }
+        .subtitulo { color: #64748b; font-size: 0.92rem; }
+        .painel { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+
+        /* DASHBOARD CARTÕES */
+        .cartoes { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+        .cartao { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; flex: 1; min-width: 160px; text-align: center; }
+        .cartao-valor { font-size: 2rem; font-weight: 800; color: #4f46e5; }
+        .cartao-label { font-size: 0.85rem; color: #64748b; }
+        .grid-dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+        /* FORMULÁRIOS EMPILHADOS */
+        form, .linha-campos, .form-empilhado, .datas-lado-a-lado { display: flex !important; flex-direction: column !important; gap: 16px !important; }
+        .campo, .campo-bloco { width: 100% !important; display: flex; flex-direction: column; }
+        label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 5px; color: #334155; }
+        input, select, textarea { width: 100% !important; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; background: #f8fafc; font-family: inherit; margin-bottom: 0 !important; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #4f46e5; background: #fff; box-shadow: 0 0 0 3px rgba(79,70,229,0.12); }
+
+        /* BOTÕES E AÇÕES */
+        .acoes-form { display: flex !important; flex-direction: row !important; gap: 10px !important; margin-top: 20px !important; }
+        .botao { display: inline-block; background: #4f46e5; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .botao:hover { background: #4338ca; }
+        .botao-secundario { background: #fff; color: #334155; border: 1px solid #cbd5e1; }
+        .botao-secundario:hover { background: #f1f5f9; }
+        .link-acao { display: inline-block; padding: 4px 8px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 600; color: #4f46e5; }
+        .link-perigo { color: #dc2626 !important; background: #fef2f2; margin-right: 6px; }
+        .link-perigo:hover { background: #dc2626; color: #fff !important; }
+
+        /* TABELAS E BADGES */
+        .tabela-scroll { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 12px 10px; border-bottom: 1px solid #e2e8f0; font-size: 0.9rem; }
+        th { font-size: 0.75rem; text-transform: uppercase; color: #64748b; background: #f8fafc; }
+        tbody tr:hover { background: #f8fafc; }
+        .badge { padding: 3px 9px; border-radius: 99px; font-size: 0.78rem; font-weight: 600; }
+        .badge-neutro { background: #f1f5f9; color: #475569; }
+        .badge-info { background: #e0f2fe; color: #0369a1; }
+        .badge-aviso { background: #fef3c7; color: #b45309; }
+        .badge-sucesso { background: #dcfce7; color: #15803d; }
+        .badge-perigo { background: #fee2e2; color: #b91c1c; }
+
+        /* FLASH */
+        .flash { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 0.9rem; font-weight: 500; }
+        .flash-success { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
+        .flash-error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+        @media (max-width: 768px) {
+            .layout { flex-direction: column; }
+            .menu-lateral { width: 100%; border-right: none; border-bottom: 1px solid #e2e8f0; }
+            .conteudo { padding: 20px; }
+            .grid-dashboard { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
-    <div class="layout">
-        <!-- MENU VERTICAL -->
-        {% if current_user.id %}
-        <nav class="menu-lateral">
-            <div class="menu-titulo">🏆 FixTrack Corporation | Gestão de Serviços</div>
-            <ul>
-                <li>
-                    <a href="{{ url_for('dashboard') }}" class="{{ 'ativo' if request.endpoint == 'dashboard' else '' }}">
-                        <span class="icone">📊</span> Relatório
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url_for('listar_usuarios') }}" class="{{ 'ativo' if request.endpoint and 'usuario' in request.endpoint else '' }}">
-                        <span class="icone">🧑‍🤝‍🧑</span> Usuários
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url_for('listar_servicos') }}" class="{{ 'ativo' if request.endpoint and 'servico' in request.endpoint else '' }}">
-                        <span class="icone">🛡️</span> Serviços
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url_for('listar_equipamentos') }}" class="{{ 'ativo' if request.endpoint and 'equipamento' in request.endpoint else '' }}">
-                        <span class="icone">⚽</span> Equipamentos
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url_for('listar_recursos') }}" class="{{ 'ativo' if request.endpoint and 'recurso' in request.endpoint else '' }}">
-                        <span class="icone">🫆</span> Recursos
-                    </a>
-                </li>
-                <li>
-                    <a href="{{ url_for('logout') }}" class="{{ 'ativo' if request.endpoint and 'movimentacao' in request.endpoint else '' }}">
-                        <span class="icone">🚪</span> Sair [{{ current_user.nome }}]
-                    </a>
-                </li>
-            </ul>
-        </nav>
-{% endif %}
+<div class="layout">
+    <nav class="menu-lateral">
+        <div class="menu-titulo">
+            <div class="marca-icone">🔧</div>
+            <div class="marca-texto">
+                <span class="marca-nome">FixTrack</span>
+                <span class="marca-sub">Gestão de Serviços</span>
+            </div>
+        </div>
 
-        <main class="conteudo">
-            {% with mensagens = get_flashed_messages(with_categories=true) %}
-                {% if mensagens %}
-                    <div class="flash-container">
-                        {% for categoria, mensagem in mensagens %}
-                            <div class="flash flash-{{ categoria }}">{{ mensagem }}</div>
-                        {% endfor %}
+        <ul>
+            <li><a href="{{ url_for('dashboard') }}" class="{{ 'ativo' if request.endpoint == 'dashboard' else '' }}">📊 Dashboard</a></li>
+            <li><a href="{{ url_for('listar_servicos') }}" class="{{ 'ativo' if 'servico' in (request.endpoint or '') else '' }}">🛠️ Serviços</a></li>
+            <li><a href="{{ url_for('listar_usuarios') }}" class="{{ 'ativo' if 'usuario' in (request.endpoint or '') else '' }}">👥 Usuários</a></li>
+            <li><a href="{{ url_for('listar_equipamentos') }}" class="{{ 'ativo' if 'equipamento' in (request.endpoint or '') else '' }}">💻 Equipamentos</a></li>
+            <li><a href="{{ url_for('listar_recursos') }}" class="{{ 'ativo' if 'recurso' in (request.endpoint or '') else '' }}">📦 Recursos</a></li>
+        </ul>
+
+        {% if current_user.is_authenticated %}
+        <div class="menu-perfil">
+            <div class="perfil-card">
+                <div class="perfil-info-grupo">
+                    <div class="perfil-avatar">{{ current_user.nome | upper }}</div>
+                    <div class="perfil-dados">
+                        <span class="perfil-nome">{{ current_user.nome }}</span>
+                        <span class="perfil-cargo">{{ current_user.email }}</span>
                     </div>
-                {% endif %}
-            {% endwith %}
+                </div>
+                <a href="{{ url_for('logout') }}" class="botao-sair">Sair</a>
+            </div>
+        </div>
+        {% endif %}
+    </nav>
 
-            {% block conteudo %}
-            {% endblock %}
-        </main>
-    </div>
+    <main class="conteudo">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block conteudo %}{% endblock %}
+        {% block content %}{% endblock %}
+    </main>
+</div>
 </body>
 </html>

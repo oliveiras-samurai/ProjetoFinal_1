@@ -482,3 +482,31 @@ input:focus, select:focus, textarea:focus {
     font-size: 0.88rem;
     cursor: pointer;
 }
+.form-empilhado {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.datas-lado-a-lado {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.campo-bloco {
+    display: flex;
+    flex-direction: column;
+}
+
+.campo-bloco input,
+.campo-bloco select,
+.campo-bloco textarea {
+    margin-bottom: 0;
+}
+
+@media (max-width: 700px) {
+    .datas-lado-a-lado {
+        grid-template-columns: 1fr;
+    }
+}

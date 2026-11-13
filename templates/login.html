@@ -1,49 +1,221 @@
-{% extends "base.html" %}
-{% block titulo %}{{ 'Registro' if registo else 'Login' }}{% endblock %}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - FixTrack</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-{% block conteudo %}
-<div style="max-width: 450px; margin: 40px auto;">
-    <section class="painel formulario">
-        {% if registro %}
-            <h2> 🧩 Criar Conta</h2>
-            <h5> Crie uma conta para fazer o login.</h5>
-            <form method="POST" action="{{ url_for('registro') }}">
-                <div class="campo">
-                    <label for="nome">Nome *</label>
-                    <input type="text" id="nome" name="nome" required>
-                </div>
-                <div class="campo">
-                    <label for="email">Email *</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="campo">
-                    <label for="senha">Senha *</label>
-                    <input type="password" id="senha" name="senha" required>
-                </div>
-                <div class="acoes-form">
-                    <button type="submit" class="botao">Registrar</button>
-                    <a href="{{ url_for('login') }}" class="botao botao-secundario">Já tenho conta</a>
-                </div>
-            </form>
-        {% else %}
-            <h2>🫆 Login</h2>
-            <h5> Faça o login para entrar no site.</h5>
+        body {
+            font-family: "Segoe UI", Roboto, Arial, sans-serif;
+            background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 50%, #e0e7ff 100%);
+            color: #1e293b;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
 
-            <form method="POST" action="{{ url_for('login') }}">
-                <div class="campo">
-                    <label for="email">Email *</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="campo">
-                    <label for="senha">Senha *</label>
-                    <input type="password" id="senha" name="senha" required>
-                </div>
-                <div class="acoes-form">
-                    <button type="submit" class="botao">Entrar</button>
-                    <a href="{{ url_for('login', registro=True) }}" class="botao botao-secundario">Criar Conta</a>
-                </div>
-            </form>
-        {% endif %}
-    </section>
-</div>
-{% endblock %}
+        /* LOGO FIXTRACK NO TOPO */
+        .marca-login {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .marca-icone {
+            width: 48px;
+            height: 48px;
+            background: #4f46e5;
+            color: #ffffff;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+        }
+
+        .marca-texto {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .marca-nome {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #4f46e5;
+            letter-spacing: -0.02em;
+        }
+
+        .marca-sub {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* CARTÃO DE LOGIN */
+        .login-card {
+            width: 100%;
+            max-width: 410px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 36px 32px;
+            box-shadow: 0 15px 30px rgba(15, 23, 42, 0.06);
+        }
+
+        .login-card h1 {
+            font-size: 1.45rem;
+            color: #0f172a;
+            margin-bottom: 6px;
+        }
+
+        .login-card p {
+            color: #64748b;
+            font-size: 0.92rem;
+            margin-bottom: 22px;
+        }
+
+        .campo {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            background: #f8fafc;
+            color: #1e293b;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        /* BOTÕES */
+        .acoes-login {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 22px;
+        }
+
+        .botao {
+            display: block;
+            width: 100%;
+            text-align: center;
+            background: #4f46e5;
+            color: #ffffff;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+
+        .botao:hover {
+            background: #4338ca;
+        }
+
+        .botao-secundario {
+            background: #ffffff;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+        }
+
+        .botao-secundario:hover {
+            background: #f1f5f9;
+            color: #4f46e5;
+        }
+
+        /* MENSAGENS FLASH */
+        .flash {
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 0.88rem;
+            font-weight: 500;
+        }
+
+        .flash-success {
+            background: #ecfdf5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+
+        .flash-error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="marca-login">
+        <div class="marca-icone">🔧</div>
+        <div class="marca-texto">
+            <span class="marca-nome">FixTrack</span>
+            <span class="marca-sub">Gestão de Serviços</span>
+        </div>
+    </div>
+
+    <div class="login-card">
+        <h1>Login</h1>
+        <p>Faça o login para entrar no sistema.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <div class="campo">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" placeholder="seu@email.com" required>
+            </div>
+
+            <div class="campo">
+                <label for="senha">Senha *</label>
+                <input type="password" id="senha" name="senha" placeholder="Digite sua senha" required>
+            </div>
+
+            <div class="acoes-login">
+                <button type="submit" class="botao">Entrar</button>
+                <a href="{{ url_for('registro') }}" class="botao botao-secundario">Criar Conta</a>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>

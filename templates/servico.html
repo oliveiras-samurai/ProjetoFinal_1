@@ -14,91 +14,89 @@
 
     {% if request.endpoint == 'novo_servico' or editar %}
     <section class="painel formulario">
-        <h2>Nova OS</h2>
-        <form method="POST" action="{{ url_for('editar_servico', id_servico=editar.id) if editar else url_for('novo_servico')}}">
+        <h2>{{ 'Editar OS' if editar else 'Nova OS' }}</h2>
+        <form method="POST" action="{{ url_for('editar_servico', id_servico=editar.id) if editar else url_for('novo_servico') }}">
 
-            <div class="linha-campos">
-                <div class="campo">
-                    <label for="id_responsavel">Responsável pela OS</label>
-                    <input type="text" id="id_responsavel" name="id_responsavel"  value="{{ editar.id_responsavel if editar else '' }}">
-                </div>
-            <div class="linha-campos">
-                <div class="campo">
-                    <label for="data_abertura">Data abertura </label>
-                    <input type="datetime-local" id="data_abertura" name="data_abertura"  value="{{ editar.data_abertura if editar else '' }}">
-                </div>
-                <div class="campo">
-                    <label for="data_encerramento">Data encerramento </label>
-                    <input type="datetime-local" id="data_encerramento" name="data_encerramento"  value="{{ editar.data_encerramento if editar else '' }}">
-                </div>
+            <div class="campo" style="margin-bottom: 18px;">
+                <label for="id_responsavel">Responsável pela OS</label>
+                <input type="text" id="id_responsavel" name="id_responsavel" value="{{ editar.id_responsavel if editar else '' }}">
             </div>
-            <div class="campo">
-                <label for="nome">Descrição da OS </label>
-                <input type="text" id="nome" name="nome">
-            </div>
-                <div class="campo campo-cor">
-                    <label for="status_servico">Status da OS</label>
-                    <select id="status_servico" name="status_servico">
-                    {% if editar %}
-                    <option value="{{ editar.status_servico}}" selected>{{ editar.status_servico}}</option>
-                    {% endif %}
-                        <option value="Não iniciada">Não iniciada</option>
-                        <option value="Em espera">Em espera</option>
-                        <option value="Iniciada">Iniciada</option>
-                        <option value="Finalizada">Finalizada</option>
-                    </select>
-                </div>
 
+            <div class="campo" style="margin-bottom: 18px;">
+                <label for="nome">Título / Nome da OS</label>
+                <input type="text" id="nome" name="nome" value="{{ editar.nome if editar else '' }}">
             </div>
-             <div style="margin-bottom: 35px;">
-                <label style="display: block; font-weight: bold; color: #2b6cb0; margin-bottom: 12px; font-size: 15px;">Quais equipamentos serão utilizados?</label>
 
-                <div style="background: #fdfbfd; border: 1px solid #cbd5e1; border-radius: 6px; padding: 15px; display: flex; flex-direction: column; gap: 10px; max-height: 150px; overflow-y: auto;">
+            <div class="campo" style="margin-bottom: 18px;">
+                <label for="data_abertura">Data abertura</label>
+                <input type="datetime-local" id="data_abertura" name="data_abertura" value="{{ editar.data_abertura if editar else '' }}">
+            </div>
+
+            <div class="campo" style="margin-bottom: 18px;">
+                <label for="data_encerramento">Data encerramento</label>
+                <input type="datetime-local" id="data_encerramento" name="data_encerramento" value="{{ editar.data_encerramento if editar else '' }}">
+            </div>
+
+            <div class="campo" style="margin-bottom: 18px;">
+                <label for="descricao">Descrição da OS</label>
+                <textarea id="descricao" name="descricao" rows="4"
+                          placeholder="Descreva detalhadamente o problema, serviço solicitado ou observações..."
+                          style="resize: vertical; min-height: 100px;" value="{{ editar.descricao if editar else '' }}"></textarea>
+            </div>
+
+            <div class="campo campo-cor" style="margin-bottom: 24px;">
+                <label for="status_servico">Status da OS</label>
+                <select id="status_servico" name="status_servico" value="{{ editar.status_servico if editar else ''}}">
+                    <option value="Não iniciada"> {{ 'selected' if editar and editar.status_servico == 'Não iniciada' else '' }}Não iniciada</option>
+                    <option value="Em espera"> {{ 'selected' if editar and editar.status_servico == 'Em espera' else '' }}Em espera</option>
+                    <option value="Iniciada"> {{ 'selected' if editar and editar.status_servico == 'Iniciada' else '' }}Iniciada</option>
+                    <option value="Finalizada"> {{ 'selected' if editar and editar.status_servico == 'Finalizada' else '' }}Finalizada</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <label for="equipamento" style="display: block; font-weight: bold; color: #2b6cb0; margin-bottom: 12px; font-size: 15px;">
+                    Quais equipamentos serão utilizados?
+                </label>
+                <select id="equipamento" name="equipamento" value="{{ editar.equipamento if editar else ''}}">
+                    <option value="">Selecione um equipamento cadastrado</option>
                     {% for item in lista_equipamentos %}
-                    <label style="display: flex; align-items: center; gap: 10px; font-weight: 500; color: #333; cursor: pointer; font-size: 14px; margin: 0;">
-                    <input type="radio" id="equipamento" name="equipamento" value="{{item.nome }}" style="width: 16px; height: 16px; cursor: pointer;">
-                        <span>{{ item.Equipamento.nome }} <small style="color: #666;">({{ item.Equipamento.tipo }})</small></span>
-                    </label>
+                        <option value="{{ item.Equipamento.nome }}"> {{ 'selected' if editar and editar.equipamento == item.Equipamento.nome else '' }}
+                            {{ item.Equipamento.nome }} ({{ item.Equipamento.tipo }})
+                        </option>
                     {% else %}
-                    <p style="color: #666; font-size: 14px; margin: 0; font-style: italic;">
-                        Nenhum equipamento cadastrado para seleção.
-                    </p>
+                        <option value="" disabled>Nenhum equipamento cadastrado para seleção</option>
                     {% endfor %}
-                </div>
+                </select>
             </div>
-            <div style="margin-bottom: 35px;">
-                <label style="display: block; font-weight: bold; color: #2b6cb0; margin-bottom: 12px; font-size: 15px;">Quais recursos serão utilizados?</label>
 
-                <div style="background: #fdfbfd; border: 1px solid #cbd5e1; border-radius: 6px; padding: 15px; display: flex; flex-direction: column; gap: 10px; max-height: 150px; overflow-y: auto;">
+            <div style="margin-bottom: 24px;">
+                <label for="recurso" style="display: block; font-weight: bold; color: #2b6cb0; margin-bottom: 12px; font-size: 15px;">
+                    Quais recursos serão utilizados?
+                </label>
+                <select id="recurso" name="recurso" value="{{ editar.recurso if editar else ''}}">
+                    <option value="">Selecione um recurso cadastrado</option>
                     {% for item in lista_recursos %}
-                    <label style="display: flex; align-items: center; gap: 10px; font-weight: 500; color: #333; cursor: pointer; font-size: 14px; margin: 0;">
-                        <input type="checkbox" id="recurso" value="{{ item.nome }}" style="width: 16px; height: 16px; cursor: pointer;">
-                        <span>{{ item.Recursos.nome }}</span>
-                    </label>
+                        <option value="{{ item.Recursos.nome }}"> {{ 'selected' if editar and editar.recurso == item.Recursos.nome else '' }}
+                            {{ item.Recursos.nome }}
+                        </option>
                     {% else %}
-                    <p style="color: #666; font-size: 14px; margin: 0; font-style: italic;">
-                        Nenhum recurso cadastrado para seleção.
-                    </p>
+                        <option value="" disabled>Nenhum recurso cadastrado para seleção</option>
                     {% endfor %}
-                </div>
+                </select>
             </div>
 
-            <div class="linha-campos">
-                <div class="campo campo-cor">
-                    <label for="prioridade">Prioridade</label>
-                    <select id="prioridade" name="prioridade">
-                    {% if editar %}
-                    <option value="{{ editar.prioridade}}" selected>{{ editar.prioridade}}</option>
-                    {% endif %}
-                        <option value="Baixa">Baixa</option>
-                        <option value="Média">Média</option>
-                        <option value="Alta">Alta</option>
-                    </select>
-                </div>
+            <div class="campo campo-cor" style="margin-bottom: 24px;">
+                <label for="prioridade">Prioridade</label>
+                <select id="prioridade" name="prioridade" value="{{ editar.prioridade if editar else ''}}">
+                    <option value="Baixa"> {{ 'selected' if editar and editar.prioridade == 'Baixa' else '' }}Baixa</option>
+                    <option value="Média"> {{ 'selected' if editar and editar.prioridade == 'Média' else '' }}Média</option>
+                    <option value="Alta"> {{ 'selected' if editar and editar.prioridade == 'Alta' else '' }}Alta</option>
+                </select>
             </div>
 
             <div class="acoes-form">
-                <button type="submit" class="botao">Cadastrar</button>
+                <button type="submit" class="botao">{{ 'Salvar Alterações' if editar else 'Cadastrar' }}</button>
                 <a href="{{ url_for('listar_servicos') }}" class="botao botao-secundario">Cancelar</a>
             </div>
         </form>
@@ -131,12 +129,13 @@
                     <td>{{ servico.data_abertura }}</td>
                     <td>{{ servico.data_encerramento }}</td>
                     <td>{{ servico.id_responsavel }}</td>
-                    <td>{{ servico.status_servico}}</td>
+                    <td>{{ servico.status_servico }}</td>
                     <td>{{ servico.equipamento }}</td>
                     <td>{{ servico.recurso }}</td>
-                    <td>{{ servico.prioridade}} </td>
+                    <td>{{ servico.prioridade }}</td>
                     <td class="acoes-col">
-                        <a href="{{ url_for('excluir_servico', servico_id=servico.id) }}" class="link-acao link-perigo"> 🗑️Excluir</a>  /<a href="{{ url_for('editar_servico', id_servico=servico.id) }}"> 🛠️Editar</a>
+                        <a href="{{ url_for('excluir_servico', servico_id=servico.id) }}" class="link-acao link-perigo">🗑️ Excluir</a> /
+                        <a href="{{ url_for('editar_servico', id_servico=servico.id) }}">🛠️ Editar</a>
                     </td>
                 </tr>
             {% endfor %}
@@ -146,19 +145,4 @@
             <p class="vazio">Nenhum serviço cadastrado ainda.</p>
         {% endif %}
     </section>
-
-    {% if editar %}
-    <script>
-        document.getElementById("status_servico").value = "{{ editar.status_servico }}";
-        document.getElementById("prioridade").value = "{{ editar.prioridade }}";
-        const eqSalvos = "{{ editar.equipamento or '' }}".split(", ");
-        const recSalvos = "{{ editar.recurso or '' }}".split(", ");
-        document.querySelectorAll('input[name="equipamentos_selecionados"]').forEach(cb => {
-            if (eqSalvos.includes(cb.value)) cb.checked = true;
-        });
-        document.querySelectorAll('input[name="recursos_selecionados"]').forEach(cb => {
-            if (recSalvos.includes(cb.value)) cb.checked = true;
-        });
-    </script>
-    {% endif %}
 {% endblock %}

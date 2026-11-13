@@ -17,6 +17,7 @@ def select_quantidade_total():
     return qtd_total
 
 
+
 def salvar(nome, data_abertura, data_encerramento, id_responsavel, status_servico, equipamento, recurso, prioridade):
     try:
         resp_final = int(id_responsavel) if str(id_responsavel).isdigit() else id_responsavel
