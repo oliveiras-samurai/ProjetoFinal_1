@@ -57,6 +57,7 @@ class Pessoa(Base, UserMixin):
     id = Column(Integer, primary_key=True, autoincrement=True)
     nome = Column(String(50), nullable=False)
     email = Column(String(120), unique=True, nullable=False)
+    papel = Column(String(50), default="usuario", nullable=False)
     senha_hash = Column(String(255), nullable=False)
     criado_em = Column(DateTime, server_default=func.now())
     atualizado_em = Column(DateTime, onupdate=func.now())

@@ -1,4 +1,5 @@
 from datetime import datetime
+from functools import wraps
 from os import times
 from flask import Flask, render_template, request, redirect, url_for, flash, g
 from sqlalchemy import select
@@ -26,6 +27,22 @@ def shutdown_session(exception=None):
 @login_manager.user_loader
 def load_user(user_id):
     return db_session.get(Pessoa, int(user_id))
+
+def roles_required(*papeis_permitidos):
+    '''
+    Decorator para restringir acesso
+    baseado no papel do usuario logado
+    '''
+    def decorator(f):
+        @wraps(f)
+        @login_required
+        def decorated_function(*args, **kwargs):
+            if current_user.papel not in papeis_permitidos:
+                flash("Acesso negado: Você não tem permissão para acessar esta página", category='error')
+                return redirect(url_for('dashboard'))
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
 
 
 # Interface de autenticação
@@ -214,6 +231,7 @@ def excluir_usuario(usuario_id):
 # --- SERVIÇOS ---
 @app.route("/servicos")
 @login_required
+@roles_required('admin')
 def listar_servicos():
     servicos = tabela_ordem_servico.select_todos()
     return render_template("servico.html", servicos=servicos)
@@ -221,6 +239,7 @@ def listar_servicos():
 
 @app.route("/servicos/novo", methods=["GET", "POST"])
 @login_required
+@roles_required('admin')
 def novo_servico(id_responsavel=None):
     if request.method == "POST":
         nome = request.form.get("nome", "").strip()
