@@ -27,19 +27,18 @@ def shutdown_session(exception=None):
 def load_user(user_id):
     return db_session.get(Pessoa, int(user_id))
 
-
 def roles_required(*papeis_permitidos):
-    """
+    '''
     Decorator para restringir acesso
     baseado no papel do usuario logado
-    """
+    '''
     def decorator(f):
         @wraps(f)
         @login_required
         def decorated_function(*args, **kwargs):
             if current_user.papel not in papeis_permitidos:
-                flash("Acesso negado: Você não tem permissão para acessar esta página", category="error")
-                return redirect(url_for("dashboard"))
+                flash("Acesso negado: Você não tem permissão para acessar esta página", category='error')
+                return redirect(url_for('dashboard'))
             return f(*args, **kwargs)
         return decorated_function
     return decorator
@@ -138,12 +137,16 @@ def dashboard():
         select(func.count(Servico.id)).where(Servico.status_servico == "Em espera")
     ).scalar() or 0
 
-    iniciadas = db_session.execute(
-        select(func.count(Servico.id)).where(Servico.status_servico == "Iniciada")
+    em_andamento = db_session.execute(
+        select(func.count(Servico.id)).where(Servico.status_servico == "Em andamento")
     ).scalar() or 0
 
     finalizadas = db_session.execute(
         select(func.count(Servico.id)).where(Servico.status_servico == "Finalizada")
+    ).scalar() or 0
+
+    canceladas = db_session.execute(
+        select(func.count(Servico.id)).where(Servico.status_servico == "Cancelada")
     ).scalar() or 0
 
     return render_template(
@@ -154,8 +157,9 @@ def dashboard():
         total_recursos=recursos,
         nao_iniciadas=nao_iniciadas,
         em_espera=em_espera,
-        iniciadas=iniciadas,
+        em_andamento=em_andamento,
         finalizadas=finalizadas,
+        canceladas=canceladas,
     )
 
 
@@ -192,6 +196,7 @@ def listar_usuarios():
 
 @app.route("/usuarios/novo", methods=["GET", "POST"])
 @login_required
+@roles_required("administrador")
 def novo_usuario():
     if request.method == "POST":
         nome = request.form.get("nome")
@@ -221,6 +226,7 @@ def novo_usuario():
 
 @app.route("/usuarios/<id_usuario>", methods=["GET", "POST"])
 @login_required
+@roles_required("administrador")
 def editar_usuario(id_usuario):
     usuario = tabela_usuario.select_um(id_usuario)
 
@@ -254,6 +260,7 @@ def editar_usuario(id_usuario):
 
 @app.route("/usuarios/excluir/<usuario_id>", methods=["GET", "POST"])
 @login_required
+@roles_required("administrador")
 def excluir_usuario(usuario_id):
     usuario_sql = select(Usuario).where(Usuario.id == usuario_id)
     usuario = db_session.execute(usuario_sql).scalar_one_or_none()
@@ -275,7 +282,6 @@ def detalhes_usuario(id_usuario):
 # --- SERVIÇOS ---
 @app.route("/servicos")
 @login_required
-@roles_required("admin")
 def listar_servicos():
     termo_busca = request.args.get("busca", "").strip()
 
@@ -298,12 +304,12 @@ def listar_servicos():
 
 @app.route("/servicos/novo", methods=["GET", "POST"])
 @login_required
-@roles_required("admin")
 def novo_servico(id_responsavel=None):
     if request.method == "POST":
         nome = request.form.get("nome", "").strip()
         data_abertura = request.form.get("data_abertura")
         data_encerramento = request.form.get("data_encerramento")
+        descricao = request.form.get("descricao")
         id_responsavel = request.form.get("id_responsavel")
         status_servico = request.form.get("status_servico")
         equipamento = request.form.get("equipamento")
@@ -318,6 +324,7 @@ def novo_servico(id_responsavel=None):
             nome=nome,
             data_abertura=data_abertura,
             data_encerramento=data_encerramento,
+            descricao=descricao,
             id_responsavel=id_responsavel,
             status_servico=status_servico,
             equipamento=equipamento,
@@ -349,6 +356,7 @@ def editar_servico(id_servico, id_responsavel=None):
         nome = request.form.get("nome", "").strip()
         data_abertura = request.form.get("data_abertura")
         data_encerramento = request.form.get("data_encerramento")
+        descricao = request.form.get("descricao")
         id_responsavel = request.form.get("id_responsavel")
         status_servico = request.form.get("status_servico")
         equipamento = request.form.get("equipamento")
@@ -365,6 +373,7 @@ def editar_servico(id_servico, id_responsavel=None):
         servico.equipamento = equipamento if equipamento else "Nenhum"
         servico.recurso = recurso if recurso else "Nenhum"
         servico.prioridade = prioridade
+        servico.descricao = descricao
 
         if data_abertura:
             servico.data_abertura = datetime.strptime(data_abertura, "%Y-%m-%dT%H:%M")
@@ -392,6 +401,7 @@ def editar_servico(id_servico, id_responsavel=None):
 
 @app.route("/servicos/excluir/<servico_id>", methods=["GET", "POST"])
 @login_required
+@roles_required("administrador")
 def excluir_servico(servico_id):
     servico = tabela_ordem_servico.select_um(servico_id)
     if servico:
@@ -431,6 +441,7 @@ def listar_equipamentos():
 
 @app.route("/equipamentos/novo", methods=["GET", "POST"])
 @login_required
+@roles_required("administrador")
 def novo_equipamento():
     if request.method == "POST":
         nome = request.form.get("nome", "").strip()
@@ -449,6 +460,7 @@ def novo_equipamento():
 
 @app.route("/equipamentos/<id_equipamento>", methods=["GET", "POST"])
 @login_required
+@roles_required("administrador")
 def editar_equipamento(id_equipamento):
     equipamento = tabela_equipamento.select_um(id_equipamento)
 
@@ -465,6 +477,7 @@ def editar_equipamento(id_equipamento):
 
 @app.route("/equipamentos/excluir/<equipamento_id>", methods=["GET", "POST"])
 @login_required
+@roles_required("administrador")
 def excluir_equipamento(equipamento_id):
     equipamento = tabela_equipamento.select_um(equipamento_id)
     if equipamento:
@@ -500,6 +513,7 @@ def listar_recursos():
 
 @app.route("/recursos/novo", methods=["GET", "POST"])
 @login_required
+@roles_required("administrador")
 def novo_recurso():
     if request.method == "POST":
         nome = request.form.get("nome", "").strip()
@@ -520,6 +534,7 @@ def novo_recurso():
 
 @app.route("/recursos/<recurso_id>", methods=["GET", "POST"])
 @login_required
+@roles_required("administrador")
 def editar_recurso(recurso_id):
     recurso = db_session.execute(select(Recursos).where(Recursos.id == recurso_id)).scalar_one_or_none()
 
@@ -535,6 +550,7 @@ def editar_recurso(recurso_id):
 
 @app.route("/recursos/excluir/<recurso_id>", methods=["GET", "POST"])
 @login_required
+@roles_required("administrador")
 def excluir_recurso(recurso_id):
     recurso = db_session.execute(select(Recursos).where(Recursos.id == recurso_id)).scalar_one_or_none()
     if recurso:

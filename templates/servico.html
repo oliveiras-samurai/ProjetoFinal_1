@@ -17,28 +17,25 @@
         <h2>{{ 'Editar OS' if editar else 'Nova OS' }}</h2>
         <form method="POST" action="{{ url_for('editar_servico', id_servico=editar.id) if editar else url_for('novo_servico') }}">
 
+            <div class="campo" style="margin-bottom: 18px;">
+                <label for="nome">Nome do mandante da OS</label>
+                <input type="text" id="nome" name="nome" value="{{ editar.nome if editar else '' }}">
+            </div>
+
             <div style="margin-bottom: 24px;">
-                <label for="id_responsavel" style="display: block; font-weight: bold; color: #2b6cb0; margin-bottom: 12px; font-size: 15px;">
-                    Responsável pela OS
+                <label for="id_responsavel" style="display: block; font-weight: bold; margin-bottom: 12px; font-size: 15px;">
+                  Funcionário responsável pela OS
                 </label>
                 <select id="id_responsavel" name="id_responsavel">
                     <option value="">Selecione um usuário cadastrado</option>
                     {% for usuario in lista_usuarios %}
-                        {% set nome_formatado = usuario.nome.capitalize() if usuario.nome else '' %}
-                        {% if editar and editar.id_responsavel == nome_formatado %}
-                            <option value="{{ nome_formatado }}" selected>{{ nome_formatado }}</option>
-                        {% else %}
-                            <option value="{{ nome_formatado }}">{{ nome_formatado }}</option>
-                        {% endif %}
-                    {% else %}
-                        <option value="" disabled>Nenhum usuário cadastrado para seleção</option>
+                    {% set nome_formatado = usuario.nome.capitalize() if usuario.nome else '' %}
+                    <option value="{{ nome_formatado }}" {% if editar and editar.id_responsavel and editar.id_responsavel.lower() == nome_formatado.lower() %}selected{% endif %}>
+                    {{ nome_formatado }}
+                    </option>
                     {% endfor %}
                 </select>
-            </div>
 
-            <div class="campo" style="margin-bottom: 18px;">
-                <label for="nome">Título / Nome da OS</label>
-                <input type="text" id="nome" name="nome" value="{{ editar.nome if editar else '' }}">
             </div>
 
             <div class="campo" style="margin-bottom: 18px;">
@@ -73,16 +70,22 @@
                         <option value="Em espera">Em espera</option>
                     {% endif %}
 
-                    {% if editar and editar.status_servico == 'Iniciada' %}
-                        <option value="Iniciada" selected>Iniciada</option>
+                    {% if editar and editar.status_servico == 'Em andamento' %}
+                        <option value="Em andamento" selected>Em andamento</option>
                     {% else %}
-                        <option value="Iniciada">Iniciada</option>
+                        <option value="Em andamento">Em andamento</option>
                     {% endif %}
 
                     {% if editar and editar.status_servico == 'Finalizada' %}
                         <option value="Finalizada" selected>Finalizada</option>
                     {% else %}
                         <option value="Finalizada">Finalizada</option>
+                    {% endif %}
+
+                    {% if editar and editar.status_servico == 'Cancelada' %}
+                        <option value="Cancelada" selected>Canceladas</option>
+                    {% else %}
+                        <option value="Cancelada">Cancelada</option>
                     {% endif %}
                 </select>
             </div>
@@ -161,7 +164,7 @@
                    placeholder="Pesquisar por nome, status, prioridade, equipamento ou recurso..."
                    style="flex: 1; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px;">
 
-            <button type="submit" class="botao"> Pesquisar</button>
+            <button type="submit" class="botao">🔍 Pesquisar</button>
 
             {% if request.args.get('busca') %}
             <a href="{{ url_for('listar_servicos') }}" class="botao botao-secundario">Limpar</a>
@@ -173,9 +176,10 @@
             <thead>
                 <tr>
                     <th>Id</th>
-                    <th>Nome</th>
+                    <th>Mandante</th>
                     <th>Data Abertura</th>
                     <th>Data Encerramento</th>
+                    <th>Descrição da OS</th>
                     <th>Responsável</th>
                     <th>Status</th>
                     <th>Equipamentos</th>
@@ -192,17 +196,29 @@
                     <td>{{ s.nome }}</td>
                     <td>{{ s.data_abertura }}</td>
                     <td>{{ s.data_encerramento }}</td>
-                    <td>{{ s.id_responsavel }}</td>
+                    <td>{{ s.descricao or '-' }}</td>
+                    <td>{{ s.id_responsavel or '-' }}</td>
                     <td>{{ s.status_servico }}</td>
                     <td>{{ s.equipamento }}</td>
                     <td>{{ s.recurso }}</td>
                     <td>{{ s.prioridade }}</td>
                     <td class="acoes-col">
-                        <a href="{{ url_for('detalhes_servico', id_servico=s.id) }}" class="link-acao"> Detalhes</a> /
-                        <a href="{{ url_for('excluir_servico', servico_id=s.id) }}" class="link-excluir"> Excluir</a> /
-                        <a href="{{ url_for('editar_servico', id_servico=s.id) }}" class="link-editar"> Editar</a>
+                        <a href="{{ url_for('detalhes_servico', id_servico=s.id) }}" class="link-acao">👁️ Detalhes</a> /
+                        <a href="{{ url_for('excluir_servico', servico_id=s.id) }}" class="link-excluir">🗑️ Excluir</a> /
+                        <a href="{{ url_for('editar_servico', id_servico=s.id) }}" class="link-editar">🛠️ Editar</a>
                     </td>
-
                 </tr>
             {% endfor %}
             </tbody>
+        </table>
+        {% else %}
+            <p class="vazio">
+                {% if request.args.get('busca') %}
+                    Nenhuma OS encontrada para "{{ request.args.get('busca') }}".
+                {% else %}
+                    Nenhuma OS cadastrada ainda.
+                {% endif %}
+            </p>
+        {% endif %}
+    </section>
+{% endblock %}

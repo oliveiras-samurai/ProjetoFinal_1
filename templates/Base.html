@@ -130,7 +130,7 @@
             <li><a href="{{ url_for('inicio') }}" class="{{ 'ativo' if request.endpoint == 'inicio' else '' }}"> Início</a></li>
             <li><a href="{{ url_for('dashboard') }}" class="{{ 'ativo' if request.endpoint == 'dashboard' else '' }}"> Dados Gerais</a></li>
             <li><a href="{{ url_for('listar_servicos') }}" class="{{ 'ativo' if 'servico' in (request.endpoint or '') else '' }}"> Serviços</a></li>
-            <li><a href="{{ url_for('listar_usuarios') }}" class="{{ 'ativo' if 'usuario' in (request.endpoint or '') else '' }}"> Usuários</a></li>
+            <li><a href="{{ url_for('listar_usuarios') }}" class="{{ 'ativo' if 'usuario' in (request.endpoint or '') else '' }}"> Funcionários</a></li>
             <li><a href="{{ url_for('listar_equipamentos') }}" class="{{ 'ativo' if 'equipamento' in (request.endpoint or '') else '' }}"> Equipamentos</a></li>
             <li><a href="{{ url_for('listar_recursos') }}" class="{{ 'ativo' if 'recurso' in (request.endpoint or '') else '' }}"> Recursos</a></li>
         </ul>

@@ -18,7 +18,7 @@ def select_quantidade_total():
 
 
 
-def salvar(nome, data_abertura, data_encerramento, id_responsavel, status_servico, equipamento, recurso, prioridade):
+def salvar(nome, data_abertura, data_encerramento, descricao, id_responsavel, status_servico, equipamento, recurso, prioridade):
     try:
         resp_final = int(id_responsavel) if str(id_responsavel).isdigit() else id_responsavel
         status_final = int(status_servico) if str(status_servico).isdigit() else status_servico
@@ -72,6 +72,9 @@ def salvar(nome, data_abertura, data_encerramento, id_responsavel, status_servic
 
         if hasattr(novos_servicos, 'prioridade'):
             novos_servicos.prioridade = str(prioridade) if prioridade else None
+
+        if hasattr(novos_servicos, 'descricao'):
+            novos_servicos.descricao = str(descricao) if descricao else None
 
         db_session.add(novos_servicos)
         db_session.commit()

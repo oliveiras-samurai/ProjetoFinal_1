@@ -1,4 +1,6 @@
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime, true, Date
+from pydoc import text
+
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime, true, Date, Text
 from sqlalchemy.orm import declarative_base, relationship, sessionmaker, scoped_session, DeclarativeBase
 from sqlalchemy.sql import func
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -23,6 +25,9 @@ class Usuario(Base):
     email = Column(String(100), nullable=False, unique=True)
     data_nascimento = Column(DateTime, nullable=False)
 
+    def set_password(self, param):
+        pass
+
 
 class Servico(Base):
     usuario_id = None
@@ -31,6 +36,7 @@ class Servico(Base):
     nome = Column(String(50), nullable=False)
     data_abertura = Column(DateTime, nullable=False)
     data_encerramento = Column(DateTime, nullable=False)
+    descricao = Column(Text)
     id_responsavel = Column(String(100), nullable=False)
     status_servico = Column(String(50), nullable=False)
     equipamento = Column(String(50), nullable=False)

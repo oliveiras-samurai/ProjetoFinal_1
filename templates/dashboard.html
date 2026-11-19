@@ -17,7 +17,7 @@
         </div>
         <div class="cartao">
             <div class="cartao-valor">{{ total_usuarios }}</div>
-            <div class="cartao-label">Usuários</div>
+            <div class="cartao-label">Funcionários</div>
         </div>
         <div class="cartao">
             <div class="cartao-valor">{{ total_equipamentos }}</div>
@@ -41,12 +41,16 @@
             <div class="cartao-label">Em Espera</div>
         </div>
         <div class="cartao" style="border-top: 4px solid #0284c7;">
-            <div class="cartao-valor" style="color: #0369a1;">{{ iniciadas }}</div>
+            <div class="cartao-valor" style="color: #0369a1;">{{ em_andamento }}</div>
             <div class="cartao-label">Em Andamento</div>
         </div>
         <div class="cartao" style="border-top: 4px solid #16a34a;">
             <div class="cartao-valor" style="color: #15803d;">{{ finalizadas }}</div>
             <div class="cartao-label">Finalizadas</div>
+        </div>
+        <div class="cartao" style="border-top: 4px solid #a31616;">
+            <div class="cartao-valor" style="color: #801515;">{{ canceladas }}</div>
+            <div class="cartao-label">Canceladas</div>
         </div>
     </div>
 {% endblock %}
