@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block titulo %}Detalhes do Usuário{% endblock %}
+
+{% block conteudo %}
+    <div class="cabecalho-pagina">
+        <div>
+            <h1>🧑‍🤝‍🧑 DETALHES DO USUÁRIO #{{ usuario.id }}</h1>
+            <p class="subtitulo">Informações completas do cadastro</p>
+        </div>
+        <a href="{{ url_for('editar_usuario', id_usuario=usuario.id) }}" class="botao">🛠️ Editar Usuário</a>
+    </div>
+
+    <section class="painel">
+        <h2>{{ usuario.nome.capitalize() if usuario.nome else 'Sem nome' }}</h2>
+
+        <!-- Grade horizontal com os dados do usuário -->
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px;">
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px;">
+                <span style="display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 4px;">Nome Completo</span>
+                <strong style="font-size: 0.95rem; color: #0f172a;">{{ usuario.nome.capitalize() if usuario.nome else '-' }}</strong>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px;">
+                <span style="display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 4px;">Telefone</span>
+                <strong style="font-size: 0.95rem; color: #0f172a;">{{ usuario.telefone or '-' }}</strong>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px;">
+                <span style="display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 4px;">E-mail</span>
+                <strong style="font-size: 0.95rem; color: #0f172a;">{{ usuario.email or '-' }}</strong>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px;">
+                <span style="display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 4px;">Data de Nascimento</span>
+                <strong style="font-size: 0.95rem; color: #0f172a;">{{ usuario.data_nascimento or '-' }}</strong>
+            </div>
+
+        </div>
+
+        <div class="acoes-form">
+            <a href="{{ url_for('listar_usuarios') }}" class="botao botao-secundario">← Voltar para Lista</a>
+        </div>
+    </section>
+{% endblock %}

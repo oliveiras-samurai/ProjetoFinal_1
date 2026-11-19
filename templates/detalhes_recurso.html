@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block titulo %}Detalhes do Recurso{% endblock %}
+
+{% block conteudo %}
+    <div class="cabecalho-pagina">
+        <div>
+            <h1>📦 DETALHES DO RECURSO #{{ recurso.id }}</h1>
+            <p class="subtitulo">Informações completas do recurso cadastrado</p>
+        </div>
+        <a href="{{ url_for('editar_recurso', recurso_id=recurso.id) }}" class="botao">🛠️ Editar Recurso</a>
+    </div>
+
+    <section class="painel">
+        <h2>{{ recurso.nome or 'Sem nome' }}</h2>
+
+        <!-- Grade horizontal com os dados do recurso -->
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 24px;">
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px;">
+                <span style="display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 4px;">ID</span>
+                <strong style="font-size: 0.95rem; color: #0f172a;">#{{ recurso.id }}</strong>
+            </div>
+
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 18px;">
+                <span style="display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: #64748b; margin-bottom: 4px;">Nome do Recurso</span>
+                <strong style="font-size: 0.95rem; color: #0f172a;">{{ recurso.nome or '-' }}</strong>
+            </div>
+
+        </div>
+
+        <div class="acoes-form">
+            <a href="{{ url_for('listar_recursos') }}" class="botao botao-secundario">← Voltar para Lista</a>
+        </div>
+    </section>
+{% endblock %}

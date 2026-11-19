@@ -4,7 +4,7 @@
 {% block conteudo %}
     <div class="cabecalho-pagina">
         <div>
-            <h1>🛅 SERVIÇOS</h1>
+            <h1> SERVIÇOS</h1>
             <p class="subtitulo">Cadastro das OS</p>
         </div>
         {% if not editar and request.endpoint != 'novo_servico' %}
@@ -17,7 +17,7 @@
         <h2>{{ 'Editar OS' if editar else 'Nova OS' }}</h2>
         <form method="POST" action="{{ url_for('editar_servico', id_servico=editar.id) if editar else url_for('novo_servico') }}">
 
-                        <div style="margin-bottom: 24px;">
+            <div style="margin-bottom: 24px;">
                 <label for="id_responsavel" style="display: block; font-weight: bold; color: #2b6cb0; margin-bottom: 12px; font-size: 15px;">
                     Responsável pela OS
                 </label>
@@ -35,7 +35,6 @@
                     {% endfor %}
                 </select>
             </div>
-
 
             <div class="campo" style="margin-bottom: 18px;">
                 <label for="nome">Título / Nome da OS</label>
@@ -56,7 +55,7 @@
                 <label for="descricao">Descrição da OS</label>
                 <textarea id="descricao" name="descricao" rows="4"
                           placeholder="Descreva detalhadamente o problema, serviço solicitado ou observações..."
-                          style="resize: vertical; min-height: 100px;" value="{{ editar.descricao if editar else '' }}"></textarea>
+                          style="resize: vertical; min-height: 100px;">{{ editar.descricao if editar else '' }}</textarea>
             </div>
 
             <div class="campo campo-cor" style="margin-bottom: 24px;">
@@ -88,8 +87,7 @@
                 </select>
             </div>
 
-
-                        <div style="margin-bottom: 24px;">
+            <div style="margin-bottom: 24px;">
                 <label for="equipamento" style="display: block; font-weight: bold; color: #2b6cb0; margin-bottom: 12px; font-size: 15px;">
                     Quais equipamentos serão utilizados?
                 </label>
@@ -99,7 +97,6 @@
                        <option value="{{ item.nome }}" {% if editar and editar.equipamento == item.nome %}selected{% endif %}>
                             {{ item.nome }} ({{ item.tipo }})
                        </option>
-
                     {% else %}
                         <option value="" disabled>Nenhum equipamento cadastrado para seleção</option>
                     {% endfor %}
@@ -121,7 +118,6 @@
                     {% endfor %}
                 </select>
             </div>
-
 
             <div class="campo campo-cor" style="margin-bottom: 24px;">
                 <label for="prioridade">Prioridade</label>
@@ -146,8 +142,6 @@
                 </select>
             </div>
 
-
-
             <div class="acoes-form">
                 <button type="submit" class="botao">{{ 'Salvar Alterações' if editar else 'Cadastrar' }}</button>
                 <a href="{{ url_for('listar_servicos') }}" class="botao botao-secundario">Cancelar</a>
@@ -158,6 +152,22 @@
 
     <section class="painel">
         <h2>Lista de OS</h2>
+
+        <!-- Barra de Pesquisa acoplada -->
+        <form method="GET" action="{{ url_for('listar_servicos') }}" style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
+            <input type="text"
+                   name="busca"
+                   value="{{ request.args.get('busca', '') }}"
+                   placeholder="Pesquisar por nome, status, prioridade, equipamento ou recurso..."
+                   style="flex: 1; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px;">
+
+            <button type="submit" class="botao"> Pesquisar</button>
+
+            {% if request.args.get('busca') %}
+            <a href="{{ url_for('listar_servicos') }}" class="botao botao-secundario">Limpar</a>
+            {% endif %}
+        </form>
+
         {% if servicos %}
         <table>
             <thead>
@@ -175,27 +185,24 @@
                 </tr>
             </thead>
             <tbody>
-            {% for servico in servicos %}
+            {% for item in servicos %}
+                {% set s = item.Servico if item.Servico is defined else item %}
                 <tr>
-                    <td>{{ servico.id }}</td>
-                    <td>{{ servico.nome }}</td>
-                    <td>{{ servico.data_abertura }}</td>
-                    <td>{{ servico.data_encerramento }}</td>
-                    <td>{{ servico.id_responsavel }}</td>
-                    <td>{{ servico.status_servico }}</td>
-                    <td>{{ servico.equipamento }}</td>
-                    <td>{{ servico.recurso }}</td>
-                    <td>{{ servico.prioridade }}</td>
+                    <td>{{ s.id }}</td>
+                    <td>{{ s.nome }}</td>
+                    <td>{{ s.data_abertura }}</td>
+                    <td>{{ s.data_encerramento }}</td>
+                    <td>{{ s.id_responsavel }}</td>
+                    <td>{{ s.status_servico }}</td>
+                    <td>{{ s.equipamento }}</td>
+                    <td>{{ s.recurso }}</td>
+                    <td>{{ s.prioridade }}</td>
                     <td class="acoes-col">
-                        <a href="{{ url_for('excluir_servico', servico_id=servico.id) }}" class="link-acao link-perigo">🗑️ Excluir</a> /
-                        <a href="{{ url_for('editar_servico', id_servico=servico.id) }}">🛠️ Editar</a>
+                        <a href="{{ url_for('detalhes_servico', id_servico=s.id) }}" class="link-acao"> Detalhes</a> /
+                        <a href="{{ url_for('excluir_servico', servico_id=s.id) }}" class="link-excluir"> Excluir</a> /
+                        <a href="{{ url_for('editar_servico', id_servico=s.id) }}" class="link-editar"> Editar</a>
                     </td>
+
                 </tr>
             {% endfor %}
             </tbody>
-        </table>
-        {% else %}
-            <p class="vazio">Nenhum serviço cadastrado ainda.</p>
-        {% endif %}
-    </section>
-{% endblock %}

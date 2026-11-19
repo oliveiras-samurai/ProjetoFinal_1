@@ -4,7 +4,7 @@
 {% block conteudo %}
     <div class="cabecalho-pagina">
         <div>
-            <h1>🧑‍🤝‍🧑 USUÁRIOS</h1>
+            <h1> USUÁRIOS</h1>
             <p class="subtitulo">Cadastro dos clientes</p>
         </div>
         {% if not editar %}
@@ -14,7 +14,7 @@
 
     {% if request.endpoint == 'novo_usuario' or request.endpoint == 'editar_usuario' %}
     <section class="painel formulario">
-        <h2>Novo Usuário</h2>
+        <h2>{{ 'Editar Usuário' if editar else 'Novo Usuário' }}</h2>
         <form method="POST" action="{{ url_for('editar_usuario', id_usuario=editar.id) if editar else url_for('novo_usuario')}}">
 
             <div class="campo">
@@ -42,7 +42,7 @@
             </div>
 
             <div class="acoes-form">
-                <button type="submit" class="botao">Cadastrar</button>
+                <button type="submit" class="botao">{{ 'Salvar Alterações' if editar else 'Cadastrar' }}</button>
                 <a href="{{ url_for('listar_usuarios') }}" class="botao botao-secundario">Cancelar</a>
             </div>
         </form>
@@ -51,6 +51,22 @@
 
     <section class="painel">
         <h2>Lista de Usuários</h2>
+
+        <!-- Barra de Pesquisa acoplada -->
+        <form method="GET" action="{{ url_for('listar_usuarios') }}" style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
+            <input type="text"
+                   name="busca"
+                   value="{{ request.args.get('busca', '') }}"
+                   placeholder="Pesquisar por nome, e-mail ou telefone..."
+                   style="flex: 1; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px;">
+
+            <button type="submit" class="botao"> Pesquisar</button>
+
+            {% if request.args.get('busca') %}
+            <a href="{{ url_for('listar_usuarios') }}" class="botao botao-secundario">Limpar</a>
+            {% endif %}
+        </form>
+
         {% if usuarios %}
         <table>
             <thead>
@@ -72,14 +88,25 @@
                     <td>{{ usuario.email }}</td>
                     <td>{{ usuario.data_nascimento }}</td>
                     <td class="acoes-col">
-                        <a href="{{ url_for('excluir_usuario', usuario_id=usuario.id) }}" class="link-acao link-perigo"> 🗑️Excluir</a> /<a href="{{ url_for('editar_usuario', id_usuario=usuario.id) }}"> 🛠️Editar</a>
+                        <td class="acoes-col">
+                            <a href="{{ url_for('detalhes_usuario', id_usuario=usuario.id) }}" class="link-acao"> Detalhes</a> /
+                            <a href="{{ url_for('excluir_usuario', usuario_id=usuario.id) }}" class="link-acao link-perigo"> Excluir</a> /
+                            <a href="{{ url_for('editar_usuario', id_usuario=usuario.id) }}" class="link-acao"> Editar</a>
+                        </td>
+
                     </td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
         {% else %}
-            <p class="vazio">Nenhum usuário cadastrado ainda.</p>
+            <p class="vazio">
+                {% if request.args.get('busca') %}
+                    Nenhum usuário encontrado para "{{ request.args.get('busca') }}".
+                {% else %}
+                    Nenhum usuário cadastrado ainda.
+                {% endif %}
+            </p>
         {% endif %}
     </section>
 {% endblock %}

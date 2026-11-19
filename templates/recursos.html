@@ -4,7 +4,7 @@
 {% block conteudo %}
     <div class="cabecalho-pagina">
         <div>
-            <h1>🫆 RECURSOS</h1>
+            <h1> Recursos</h1>
             <p class="subtitulo">Cadastro de recursos para ordens de serviço</p>
         </div>
 
@@ -13,15 +13,13 @@
         {% endif %}
     </div>
 
-    <!-- 1. Exibe o formulário tanto na criação quanto na edição -->
     {% if request.endpoint == 'novo_recurso' or request.endpoint == 'editar_recurso' %}
     <section class="painel formulario">
         <h2>{{ 'Editar Recurso' if editar else 'Novo Recurso' }}</h2>
 
-        <!-- CORREÇÃO: Mudado id_recurso para recurso_id para bater com a rota do Flask -->
         <form method="POST" action="{{ url_for('editar_recurso', recurso_id=editar.id) if editar else url_for('novo_recurso') }}">
             <div class="linha-campos">
-                <!-- Nome do Recurso -->
+
                 <div class="campo">
                     <label for="nome">Nome do Recurso *</label>
                     <input type="text" id="nome" name="nome" required placeholder="Ex: Servidor Dell" value="{{ editar.nome if editar else '' }}">
@@ -38,6 +36,22 @@
 
     <section class="painel">
         <h2>Lista de Recursos</h2>
+
+
+        <form method="GET" action="{{ url_for('listar_recursos') }}" style="display: flex; gap: 10px; margin-bottom: 20px; align-items: center;">
+            <input type="text"
+                   name="busca"
+                   value="{{ request.args.get('busca', '') }}"
+                   placeholder="Pesquisar recurso por nome..."
+                   style="flex: 1; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 14px;">
+
+            <button type="submit" class="botao"> Pesquisar</button>
+
+            {% if request.args.get('busca') %}
+            <a href="{{ url_for('listar_recursos') }}" class="botao botao-secundario">Limpar</a>
+            {% endif %}
+        </form>
+
         {% if recursos %}
         <table>
             <thead>
@@ -53,15 +67,25 @@
                     <td>{{ item.Recursos.id }}</td>
                     <td>{{ item.Recursos.nome }}</td>
                     <td class="acoes-col">
-                        <a href="{{ url_for('excluir_recurso', recurso_id=item.Recursos.id) }}" class="link-excluir">🗑️ Excluir</a> /
-                        <a href="{{ url_for('editar_recurso', recurso_id=item.Recursos.id) }}" class="link-editar">🛠️ Editar</a>
+                        <td class="acoes-col">
+                            <a href="{{ url_for('detalhes_recurso', recurso_id=item.Recursos.id) }}" class="link-acao"> Detalhes</a> /
+                            <a href="{{ url_for('excluir_recurso', recurso_id=item.Recursos.id) }}" class="link-excluir"> Excluir</a> /
+                            <a href="{{ url_for('editar_recurso', recurso_id=item.Recursos.id) }}" class="link-editar"> Editar</a>
+                        </td>
+
                     </td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
         {% else %}
-            <p class="vazio">Nenhum recurso cadastrado ainda.</p>
+            <p class="vazio">
+                {% if request.args.get('busca') %}
+                    Nenhum recurso encontrado para "{{ request.args.get('busca') }}".
+                {% else %}
+                    Nenhum recurso cadastrado ainda.
+                {% endif %}
+            </p>
         {% endif %}
     </section>
 {% endblock %}

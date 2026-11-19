@@ -5,62 +5,79 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block titulo %}FixTrack{% endblock %}</title>
     <style>
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: "Segoe UI", Roboto, Arial, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.5; }
-        .layout { display: flex; min-height: 100vh; }
 
-        /* MENU LATERAL */
-        .menu-lateral { width: 250px; background: #fff; border-right: 1px solid #e2e8f0; padding: 24px 14px; display: flex; flex-direction: column; flex-shrink: 0; }
+        /* ESTRUTURA PRINCIPAL (MENU NO TOPO + CONTEÚDO ABAIXO) */
+        .layout { display: flex; flex-direction: column; min-height: 100vh; }
 
-        /* CABEÇALHO DA MARCA NO MENU */
-        .menu-titulo { display: flex; align-items: center; gap: 12px; padding: 0 8px 20px 8px; border-bottom: 1px solid #e2e8f0; margin-bottom: 16px; }
-        .marca-icone { width: 38px; height: 38px; background: #eef2ff; color: #4f46e5; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
-        .marca-texto { display: flex; flex-direction: column; line-height: 1.2; }
-        .marca-nome { font-size: 1.25rem; font-weight: 800; color: #4f46e5; letter-spacing: -0.02em; }
-        .marca-sub { font-size: 0.72rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+        /* BARRA DE NAVEGAÇÃO HORIZONTAL */
+        .menu-lateral {
+            width: 100%;
+            background: #fff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 12px 32px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        }
 
-        /* LINKS DO MENU */
-        .menu-lateral ul { list-style: none; display: flex; flex-direction: column; gap: 6px; flex: 1; }
-        .menu-lateral a { display: flex; align-items: center; gap: 10px; color: #475569; text-decoration: none; padding: 10px 14px; border-radius: 8px; font-weight: 500; transition: 0.2s; }
+        /* LOGO E NOME DO SISTEMA */
+        .menu-titulo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .marca-icone { width: 36px; height: 36px; background: #eef2ff; color: #4f46e5; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.15rem; flex-shrink: 0; }
+        .marca-texto { display: flex; flex-direction: column; line-height: 1.15; }
+        .marca-nome { font-size: 1.15rem; font-weight: 800; color: #4f46e5; letter-spacing: -0.02em; }
+        .marca-sub { font-size: 0.65rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.04em; }
+
+        /* LINKS DO MENU LADO A LADO */
+        .menu-lateral ul { list-style: none; display: flex; flex-direction: row; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .menu-lateral a { display: flex; align-items: center; gap: 6px; color: #475569; text-decoration: none; padding: 8px 12px; border-radius: 8px; font-size: 0.9rem; font-weight: 500; transition: 0.2s; white-space: nowrap; }
         .menu-lateral a:hover, .menu-lateral a.ativo { background: #eef2ff; color: #4f46e5; font-weight: 600; }
 
-        /* PERFIL E SAIR */
-        .menu-perfil { margin-top: auto; padding-top: 14px; border-top: 1px solid #e2e8f0; }
-        .perfil-card { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #f8fafc; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; }
-        .perfil-info-grupo { display: flex; align-items: center; gap: 8px; min-width: 0; }
-        .perfil-avatar { width: 34px; height: 34px; border-radius: 50%; background: #4f46e5; color: #fff; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .perfil-dados { display: flex; flex-direction: column; min-width: 0; }
-        .perfil-nome { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .perfil-cargo { font-size: 0.72rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .menu-lateral a.botao-sair { padding: 6px 10px; background: #fef2f2; color: #dc2626; font-size: 0.8rem; font-weight: 600; border-radius: 6px; }
+        /* PERFIL DO USUÁRIO E BOTÃO SAIR */
+        .menu-perfil { flex-shrink: 0; }
+        .perfil-card { display: flex; align-items: center; gap: 10px; background: #f8fafc; padding: 6px 12px; border-radius: 10px; border: 1px solid #e2e8f0; }
+        .perfil-info-grupo { display: flex; align-items: center; gap: 8px; }
+        .perfil-avatar { width: 30px; height: 30px; border-radius: 50%; background: #4f46e5; color: #fff; font-size: 0.85rem; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .perfil-dados { display: flex; flex-direction: column; line-height: 1.2; }
+        .perfil-nome { font-size: 0.82rem; font-weight: 600; color: #0f172a; }
+        .perfil-cargo { font-size: 0.7rem; color: #64748b; }
+        .menu-lateral a.botao-sair { padding: 5px 10px; background: #fef2f2; color: #dc2626; font-size: 0.78rem; font-weight: 600; border-radius: 6px; }
         .menu-lateral a.botao-sair:hover { background: #dc2626; color: #fff; }
 
-        /* CONTEÚDO E PAINÉIS */
-        .conteudo { flex: 1; padding: 32px 40px; max-width: 1150px; }
+        /* ÁREA DE CONTEÚDO E PAINÉIS */
+        .conteudo { flex: 1; padding: 32px 40px; max-width: 1200px; width: 100%; margin: 0 auto; }
         .cabecalho-pagina { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         h1 { font-size: 1.6rem; color: #0f172a; }
         h2 { font-size: 1.15rem; margin-bottom: 16px; color: #1e293b; }
         .subtitulo { color: #64748b; font-size: 0.92rem; }
         .painel { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
-
-        /* DASHBOARD CARTÕES */
+        /* CARTÕES DE RESUMO DO DASHBOARD */
         .cartoes { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
         .cartao { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; flex: 1; min-width: 160px; text-align: center; }
         .cartao-valor { font-size: 2rem; font-weight: 800; color: #4f46e5; }
         .cartao-label { font-size: 0.85rem; color: #64748b; }
         .grid-dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
-        /* FORMULÁRIOS EMPILHADOS */
-        form, .linha-campos, .form-empilhado, .datas-lado-a-lado { display: flex !important; flex-direction: column !important; gap: 16px !important; }
+        /* FORMULÁRIOS DE CADASTRO (EMPILHADOS) E BARRA DE PESQUISA (HORIZONTAL) */
+        form:not([method="GET"]), .linha-campos, .form-empilhado, .datas-lado-a-lado { display: flex !important; flex-direction: column !important; gap: 16px !important; }
+        form[method="GET"] { display: flex !important; flex-direction: row !important; gap: 10px !important; align-items: center !important; }
+        form[method="GET"] input { flex: 1 !important; width: auto !important; }
+
         .campo, .campo-bloco { width: 100% !important; display: flex; flex-direction: column; }
         label { display: block; font-size: 0.88rem; font-weight: 600; margin-bottom: 5px; color: #334155; }
         input, select, textarea { width: 100% !important; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; background: #f8fafc; font-family: inherit; margin-bottom: 0 !important; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: #4f46e5; background: #fff; box-shadow: 0 0 0 3px rgba(79,70,229,0.12); }
 
-        /* BOTÕES E AÇÕES */
+        /* BOTÕES E LINKS DE AÇÃO */
         .acoes-form { display: flex !important; flex-direction: row !important; gap: 10px !important; margin-top: 20px !important; }
-        .botao { display: inline-block; background: #4f46e5; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .botao { display: inline-block; background: #4f46e5; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: 0.2s; white-space: nowrap; }
         .botao:hover { background: #4338ca; }
         .botao-secundario { background: #fff; color: #334155; border: 1px solid #cbd5e1; }
         .botao-secundario:hover { background: #f1f5f9; }
@@ -68,27 +85,31 @@
         .link-perigo { color: #dc2626 !important; background: #fef2f2; margin-right: 6px; }
         .link-perigo:hover { background: #dc2626; color: #fff !important; }
 
-        /* TABELAS E BADGES */
+        /* TABELAS */
         .tabela-scroll { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; }
         th, td { text-align: left; padding: 12px 10px; border-bottom: 1px solid #e2e8f0; font-size: 0.9rem; }
         th { font-size: 0.75rem; text-transform: uppercase; color: #64748b; background: #f8fafc; }
         tbody tr:hover { background: #f8fafc; }
-        .badge { padding: 3px 9px; border-radius: 99px; font-size: 0.78rem; font-weight: 600; }
-        .badge-neutro { background: #f1f5f9; color: #475569; }
-        .badge-info { background: #e0f2fe; color: #0369a1; }
-        .badge-aviso { background: #fef3c7; color: #b45309; }
-        .badge-sucesso { background: #dcfce7; color: #15803d; }
-        .badge-perigo { background: #fee2e2; color: #b91c1c; }
 
-        /* FLASH */
+        /* ETIQUETAS COLORIDAS (STATUS E PRIORIDADES) */
+        .etiqueta { padding: 3px 9px; border-radius: 99px; font-size: 0.78rem; font-weight: 600; }
+        .etiqueta-cinza { background: #f1f5f9; color: #475569; }    /* Neutro / Não iniciada */
+        .etiqueta-azul { background: #e0f2fe; color: #0369a1; }     /* Em andamento / Iniciada */
+        .etiqueta-amarela { background: #fef3c7; color: #b45309; }  /* Atenção / Em espera / Média */
+        .etiqueta-verde { background: #dcfce7; color: #15803d; }    /* Concluído / Finalizada / Baixa */
+        .etiqueta-vermelha { background: #fee2e2; color: #b91c1c; } /* Urgente / Prioridade Alta */
+
+        /* MENSAGENS DE AVISO DO SISTEMA (FLASH) */
         .flash { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 0.9rem; font-weight: 500; }
         .flash-success { background: #ecfdf5; color: #059669; border: 1px solid #a7f3d0; }
         .flash-error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
 
-        @media (max-width: 768px) {
-            .layout { flex-direction: column; }
-            .menu-lateral { width: 100%; border-right: none; border-bottom: 1px solid #e2e8f0; }
+        /* ADAPTAÇÃO PARA TELAS MENORES (CELULAR / TABLET) */
+        @media (max-width: 960px) {
+            .menu-lateral { flex-direction: column; align-items: stretch; padding: 16px; }
+            .menu-lateral ul { justify-content: center; }
+            .perfil-card { justify-content: space-between; }
             .conteudo { padding: 20px; }
             .grid-dashboard { grid-template-columns: 1fr; }
         }
@@ -106,19 +127,19 @@
         </div>
 
         <ul>
-            <li><a href="{{ url_for('inicio') }}" class="{{ 'ativo' if request.endpoint == 'inicio' else '' }}">🚪 Tela Inicial</a></li>
-            <li><a href="{{ url_for('dashboard') }}" class="{{ 'ativo' if request.endpoint == 'dashboard' else '' }}">📊 Dashboard</a></li>
-            <li><a href="{{ url_for('listar_servicos') }}" class="{{ 'ativo' if 'servico' in (request.endpoint or '') else '' }}">🛠️ Serviços</a></li>
-            <li><a href="{{ url_for('listar_usuarios') }}" class="{{ 'ativo' if 'usuario' in (request.endpoint or '') else '' }}">👥 Usuários</a></li>
-            <li><a href="{{ url_for('listar_equipamentos') }}" class="{{ 'ativo' if 'equipamento' in (request.endpoint or '') else '' }}">💻 Equipamentos</a></li>
-            <li><a href="{{ url_for('listar_recursos') }}" class="{{ 'ativo' if 'recurso' in (request.endpoint or '') else '' }}">📦 Recursos</a></li>
+            <li><a href="{{ url_for('inicio') }}" class="{{ 'ativo' if request.endpoint == 'inicio' else '' }}"> Início</a></li>
+            <li><a href="{{ url_for('dashboard') }}" class="{{ 'ativo' if request.endpoint == 'dashboard' else '' }}"> Dados Gerais</a></li>
+            <li><a href="{{ url_for('listar_servicos') }}" class="{{ 'ativo' if 'servico' in (request.endpoint or '') else '' }}"> Serviços</a></li>
+            <li><a href="{{ url_for('listar_usuarios') }}" class="{{ 'ativo' if 'usuario' in (request.endpoint or '') else '' }}"> Usuários</a></li>
+            <li><a href="{{ url_for('listar_equipamentos') }}" class="{{ 'ativo' if 'equipamento' in (request.endpoint or '') else '' }}"> Equipamentos</a></li>
+            <li><a href="{{ url_for('listar_recursos') }}" class="{{ 'ativo' if 'recurso' in (request.endpoint or '') else '' }}"> Recursos</a></li>
         </ul>
 
         {% if current_user.is_authenticated %}
         <div class="menu-perfil">
             <div class="perfil-card">
                 <div class="perfil-info-grupo">
-                    <div class="perfil-avatar">{{ current_user.nome | upper }}</div>
+                    <div class="perfil-avatar">{{ current_user.nome[0]| upper if current_user.nome else 'U' }}</div>
                     <div class="perfil-dados">
                         <span class="perfil-nome">{{ current_user.nome }}</span>
                         <span class="perfil-cargo">{{ current_user.email }}</span>
@@ -131,16 +152,15 @@
     </nav>
 
     <main class="conteudo">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% with mensagens = get_flashed_messages(with_categories=true) %}
+            {% if mensagens %}
+                {% for categoria, mensagem in mensagens %}
+                    <div class="flash flash-{{ categoria }}">{{ mensagem }}</div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
 
         {% block conteudo %}{% endblock %}
-        {% block content %}{% endblock %}
     </main>
 </div>
 </body>

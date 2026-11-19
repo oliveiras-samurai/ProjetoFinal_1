@@ -1,10 +1,15 @@
 {% extends "base.html" %}
-{% block titulo %}Dashboard{% endblock %}
+{% block titulo %}Dados Gerais{% endblock %}
 
 {% block conteudo %}
-    <h1>Dados do Site</h1>
-    <p class="subtitulo">Relatório Geral</p>
+    <div class="cabecalho-pagina">
+        <div>
+            <h1>Dados do Site</h1>
+            <p class="subtitulo">Relatório Geral</p>
+        </div>
+    </div>
 
+    <!-- Cartões Gerais -->
     <div class="cartoes">
         <div class="cartao">
             <div class="cartao-valor">{{ total_servicos }}</div>
@@ -24,7 +29,24 @@
         </div>
     </div>
 
-    <div class="grid-dashboard">
-
+    <!-- Cartões de Status dos Trabalhos (OS) -->
+    <h2>Status dos Trabalhos</h2>
+    <div class="cartoes">
+        <div class="cartao" style="border-top: 4px solid #64748b;">
+            <div class="cartao-valor" style="color: #475569;">{{ nao_iniciadas }}</div>
+            <div class="cartao-label">Não Iniciadas</div>
+        </div>
+        <div class="cartao" style="border-top: 4px solid #d97706;">
+            <div class="cartao-valor" style="color: #b45309;">{{ em_espera }}</div>
+            <div class="cartao-label">Em Espera</div>
+        </div>
+        <div class="cartao" style="border-top: 4px solid #0284c7;">
+            <div class="cartao-valor" style="color: #0369a1;">{{ iniciadas }}</div>
+            <div class="cartao-label">Em Andamento</div>
+        </div>
+        <div class="cartao" style="border-top: 4px solid #16a34a;">
+            <div class="cartao-valor" style="color: #15803d;">{{ finalizadas }}</div>
+            <div class="cartao-label">Finalizadas</div>
+        </div>
     </div>
 {% endblock %}

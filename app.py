@@ -1,8 +1,7 @@
 from datetime import datetime
 from functools import wraps
-from os import times
-from flask import Flask, render_template, request, redirect, url_for, flash, g
-from sqlalchemy import select
+from flask import Flask, render_template, request, redirect, url_for, flash
+from sqlalchemy import select, or_, func
 from sqlalchemy.exc import SQLAlchemyError
 from banco import tabela_ordem_servico, tabela_usuario, tabela_equipamento, tabela_recurso
 from models import db_session, Usuario, Pessoa, Servico, Equipamento, Recursos
@@ -28,25 +27,26 @@ def shutdown_session(exception=None):
 def load_user(user_id):
     return db_session.get(Pessoa, int(user_id))
 
+
 def roles_required(*papeis_permitidos):
-    '''
+    """
     Decorator para restringir acesso
     baseado no papel do usuario logado
-    '''
+    """
     def decorator(f):
         @wraps(f)
         @login_required
         def decorated_function(*args, **kwargs):
             if current_user.papel not in papeis_permitidos:
-                flash("Acesso negado: Você não tem permissão para acessar esta página", category='error')
-                return redirect(url_for('dashboard'))
+                flash("Acesso negado: Você não tem permissão para acessar esta página", category="error")
+                return redirect(url_for("dashboard"))
             return f(*args, **kwargs)
         return decorated_function
     return decorator
 
 
 # Interface de autenticação
-@app.route('/login', methods=["GET", "POST"])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         email = request.form.get("email", "").strip()
@@ -56,15 +56,15 @@ def login():
         pessoa_resultado = db_session.execute(pessoa_sql).scalar()
 
         if not pessoa_resultado:
-            flash('Falha na autenticação: E-mail não encontrado', 'error')
-            return redirect(url_for('login'))
+            flash("Falha na autenticação: E-mail não encontrado", "error")
+            return redirect(url_for("login"))
 
         if pessoa_resultado and pessoa_resultado.check_password(senha):
             login_user(pessoa_resultado)
             return redirect(url_for("dashboard"))
         else:
-            flash('falha na autenticação: Senha incorreta', 'error')
-            return redirect(url_for('login'))
+            flash("Falha na autenticação: Senha incorreta", "error")
+            return redirect(url_for("login"))
 
     return render_template(
         "login.html",
@@ -72,14 +72,14 @@ def login():
     )
 
 
-@app.route('/logout')
+@app.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect(url_for("login"))
 
 
-@app.route('/registro', methods=["GET", "POST"])
+@app.route("/registro", methods=["GET", "POST"])
 def registro():
     if request.method == "POST":
         nome = request.form.get("nome", "").strip()
@@ -87,14 +87,14 @@ def registro():
         senha = request.form.get("senha", "").strip()
 
         if not nome and not email and not senha:
-            flash('Preencher todos os campos', 'error')
-            return redirect(url_for('registro'))
+            flash("Preencher todos os campos", "error")
+            return redirect(url_for("registro"))
         pessoa_sql = select(Pessoa).where(Pessoa.email == email)
         pessoa_email = db_session.execute(pessoa_sql).scalar_one_or_none()
 
         if pessoa_email:
-            flash('E-mail já cadastrado', 'error')
-            return redirect(url_for('registro'))
+            flash("E-mail já cadastrado", "error")
+            return redirect(url_for("registro"))
         try:
             nova_pessoa = Pessoa(
                 nome=nome,
@@ -103,23 +103,23 @@ def registro():
             nova_pessoa.set_password(senha)
             db_session.add(nova_pessoa)
             db_session.commit()
-            flash('Usuário cadastrado', 'success')
-            return redirect(url_for('login'))
+            flash("Usuário cadastrado", "success")
+            return redirect(url_for("login"))
         except SQLAlchemyError as e:
-            print(f'SQLALchemyError:{e}')
-            flash('Erro no banco')
-            return redirect(url_for('registro'))
+            print(f"SQLALchemyError:{e}")
+            flash("Erro no banco")
+            return redirect(url_for("registro"))
         except Exception as e:
-            print(f'Erro ao registrar')
-            flash(f'Erro ao registrar', category='error')
-            return redirect(url_for('registro'))
+            print(f"Erro ao registrar: {e}")
+            flash("Erro ao registrar", category="error")
+            return redirect(url_for("registro"))
     return render_template("login.html")
 
 
 @app.route("/")
-
 def inicio():
-    return render_template('inicio.html')
+    return render_template("inicio.html")
+
 
 @app.route("/dashboard")
 @login_required
@@ -129,13 +129,35 @@ def dashboard():
     equipamentos = tabela_equipamento.select_quantidade_total()
     recursos = tabela_recurso.select_quantidade_total()
 
+    # Contagem por status da OS
+    nao_iniciadas = db_session.execute(
+        select(func.count(Servico.id)).where(Servico.status_servico == "Não iniciada")
+    ).scalar() or 0
+
+    em_espera = db_session.execute(
+        select(func.count(Servico.id)).where(Servico.status_servico == "Em espera")
+    ).scalar() or 0
+
+    iniciadas = db_session.execute(
+        select(func.count(Servico.id)).where(Servico.status_servico == "Iniciada")
+    ).scalar() or 0
+
+    finalizadas = db_session.execute(
+        select(func.count(Servico.id)).where(Servico.status_servico == "Finalizada")
+    ).scalar() or 0
+
     return render_template(
         "dashboard.html",
         total_usuarios=usuarios,
         total_servicos=servicos,
         total_equipamentos=equipamentos,
         total_recursos=recursos,
+        nao_iniciadas=nao_iniciadas,
+        em_espera=em_espera,
+        iniciadas=iniciadas,
+        finalizadas=finalizadas,
     )
+
 
 
 # --- USUÁRIOS ---
@@ -143,21 +165,32 @@ def get_usuarios():
     return db_session.execute(select(Usuario, Servico).outerjoin(Servico, Usuario.servico_id == Servico.id)).all()
 
 
-@app.route('/usuarios')
+@app.route("/usuarios")
 @login_required
 def listar_usuarios():
     db_session.commit()
+    termo_busca = request.args.get("busca", "").strip()
+
     query = select(Usuario, Servico).outerjoin(Servico, Usuario.servico_id == Servico.id)
+    if termo_busca:
+        query = query.where(
+            or_(
+                Usuario.nome.ilike(f"%{termo_busca}%"),
+                Usuario.email.ilike(f"%{termo_busca}%"),
+                Usuario.telefone.ilike(f"%{termo_busca}%")
+            )
+        )
+
     usuarios_do_banco = db_session.execute(query).all()
     todos_servicos = db_session.execute(select(Servico)).scalars().all()
     return render_template(
-        'usuarios.html',
+        "usuarios.html",
         usuarios=usuarios_do_banco,
         servicos=todos_servicos
     )
 
 
-@app.route('/usuarios/novo', methods=['GET', 'POST'])
+@app.route("/usuarios/novo", methods=["GET", "POST"])
 @login_required
 def novo_usuario():
     if request.method == "POST":
@@ -167,17 +200,17 @@ def novo_usuario():
         data_nascimento = request.form.get("data_nascimento")
 
         if not nome:
-            flash('Preencha o nome do jogador', 'error')
-            return render_template('usuarios.html')
+            flash("Preencha o nome do usuário", "error")
+            return render_template("usuarios.html")
         if not telefone:
-            flash('Preencha o número de telefone', 'error')
-            return render_template('usuarios.html')
+            flash("Preencha o número de telefone", "error")
+            return render_template("usuarios.html")
         if not email:
-            flash('Preencha o email', 'error')
-            return render_template('usuarios.html')
+            flash("Preencha o email", "error")
+            return render_template("usuarios.html")
         if not data_nascimento:
-            flash('Preencha a data', 'error')
-            return render_template('usuarios.html')
+            flash("Preencha a data", "error")
+            return render_template("usuarios.html")
 
         tabela_usuario.salvar(nome=nome, telefone=telefone, email=email, data_nascimento=data_nascimento)
         return redirect(url_for("listar_usuarios"))
@@ -198,13 +231,13 @@ def editar_usuario(id_usuario):
         data_nascimento = request.form.get("data_nascimento")
 
         if not nome:
-            flash('Preencha o nome do jogador', 'error')
+            flash("Preencha o nome do usuário", "error")
         elif not telefone:
-            flash('Preencha o número de telefone', 'error')
+            flash("Preencha o número de telefone", "error")
         elif not email:
-            flash('Preencha o email', 'error')
+            flash("Preencha o email", "error")
         elif not data_nascimento:
-            flash('Preencha a data', 'error')
+            flash("Preencha a data", "error")
         else:
             usuario.nome = nome
             usuario.telefone = telefone
@@ -227,19 +260,45 @@ def excluir_usuario(usuario_id):
     if usuario:
         db_session.delete(usuario)
         db_session.commit()
-    return redirect(url_for('listar_usuarios'))
+    return redirect(url_for("listar_usuarios"))
+
+@app.route("/usuarios/detalhes/<id_usuario>")
+@login_required
+def detalhes_usuario(id_usuario):
+    usuario = tabela_usuario.select_um(id_usuario)
+    if not usuario:
+        flash("Usuário não encontrado", "error")
+        return redirect(url_for("listar_usuarios"))
+    return render_template("detalhes_usuario.html", usuario=usuario)
+
+
 # --- SERVIÇOS ---
 @app.route("/servicos")
 @login_required
-@roles_required('admin')
+@roles_required("admin")
 def listar_servicos():
-    servicos = tabela_ordem_servico.select_todos()
+    termo_busca = request.args.get("busca", "").strip()
+
+    if termo_busca:
+        query = select(Servico).where(
+            or_(
+                Servico.nome.ilike(f"%{termo_busca}%"),
+                Servico.status_servico.ilike(f"%{termo_busca}%"),
+                Servico.prioridade.ilike(f"%{termo_busca}%"),
+                Servico.equipamento.ilike(f"%{termo_busca}%"),
+                Servico.recurso.ilike(f"%{termo_busca}%")
+            )
+        )
+        servicos = db_session.execute(query).all()
+    else:
+        servicos = tabela_ordem_servico.select_todos()
+
     return render_template("servico.html", servicos=servicos)
 
 
 @app.route("/servicos/novo", methods=["GET", "POST"])
 @login_required
-@roles_required('admin')
+@roles_required("admin")
 def novo_servico(id_responsavel=None):
     if request.method == "POST":
         nome = request.form.get("nome", "").strip()
@@ -252,8 +311,8 @@ def novo_servico(id_responsavel=None):
         prioridade = request.form.get("prioridade")
 
         if not nome:
-            flash('Preencha o nome', 'error')
-            return redirect(url_for('novo_servico'))
+            flash("Preencha o nome", "error")
+            return redirect(url_for("novo_servico"))
 
         tabela_ordem_servico.salvar(
             nome=nome,
@@ -297,8 +356,8 @@ def editar_servico(id_servico, id_responsavel=None):
         prioridade = request.form.get("prioridade")
 
         if not nome:
-            flash('Preencha o nome', 'error')
-            return redirect(url_for('editar_servico', id_servico=id_servico))
+            flash("Preencha o nome", "error")
+            return redirect(url_for("editar_servico", id_servico=id_servico))
 
         servico.nome = nome
         servico.id_responsavel = id_responsavel
@@ -308,9 +367,9 @@ def editar_servico(id_servico, id_responsavel=None):
         servico.prioridade = prioridade
 
         if data_abertura:
-            servico.data_abertura = datetime.strptime(data_abertura, '%Y-%m-%dT%H:%M')
+            servico.data_abertura = datetime.strptime(data_abertura, "%Y-%m-%dT%H:%M")
         if data_encerramento:
-            servico.data_encerramento = datetime.strptime(data_encerramento, '%Y-%m-%dT%H:%M')
+            servico.data_encerramento = datetime.strptime(data_encerramento, "%Y-%m-%dT%H:%M")
 
         db_session.commit()
         flash("Serviço alterado com sucesso", category="success")
@@ -339,14 +398,34 @@ def excluir_servico(servico_id):
         db_session.delete(servico)
         db_session.commit()
         flash("Serviço excluído com sucesso", category="success")
-    return redirect(url_for('listar_servicos'))
+    return redirect(url_for("listar_servicos"))
 
+@app.route("/servicos/detalhes/<id_servico>")
+@login_required
+def detalhes_servico(id_servico):
+    servico = tabela_ordem_servico.select_um(id_servico)
+    if not servico:
+        flash("Serviço não encontrado", "error")
+        return redirect(url_for("listar_servicos"))
+    return render_template("detalhes_servico.html", servico=servico)
 
 # --- EQUIPAMENTOS ---
 @app.route("/equipamentos")
 @login_required
 def listar_equipamentos():
-    equipamentos = tabela_equipamento.select_todos_equipamentos()
+    termo_busca = request.args.get("busca", "").strip()
+
+    if termo_busca:
+        query = select(Equipamento).where(
+            or_(
+                Equipamento.nome.ilike(f"%{termo_busca}%"),
+                Equipamento.tipo.ilike(f"%{termo_busca}%")
+            )
+        )
+        equipamentos = db_session.execute(query).all()
+    else:
+        equipamentos = tabela_equipamento.select_todos_equipamentos()
+
     return render_template("equipamentos.html", equipamentos=equipamentos)
 
 
@@ -358,8 +437,8 @@ def novo_equipamento():
         tipo = request.form.get("tipo", "").strip()
 
         if not nome:
-            flash('Preencha o nome do equipamento', 'error')
-            return redirect(url_for('novo_equipamento'))
+            flash("Preencha o nome do equipamento", "error")
+            return redirect(url_for("novo_equipamento"))
 
         tabela_equipamento.salvar_equipamento(nome=nome, tipo=tipo)
         return redirect(url_for("listar_equipamentos"))
@@ -392,14 +471,30 @@ def excluir_equipamento(equipamento_id):
         db_session.delete(equipamento)
         db_session.commit()
         flash("Equipamento excluído com sucesso", category="success")
-    return redirect(url_for('listar_equipamentos'))
+    return redirect(url_for("listar_equipamentos"))
+
+@app.route("/equipamentos/detalhes/<id_equipamento>")
+@login_required
+def detalhes_equipamento(id_equipamento):
+    equipamento = tabela_equipamento.select_um(id_equipamento)
+    if not equipamento:
+        flash("Equipamento não encontrado", "error")
+        return redirect(url_for("listar_equipamentos"))
+    return render_template("detalhes_equipamentos.html", equipamento=equipamento)
+
 
 
 # --- RECURSOS ---
 @app.route("/recursos")
 @login_required
 def listar_recursos():
-    recursos = db_session.execute(select(Recursos)).all()
+    termo_busca = request.args.get("busca", "").strip()
+
+    query = select(Recursos)
+    if termo_busca:
+        query = query.where(Recursos.nome.ilike(f"%{termo_busca}%"))
+
+    recursos = db_session.execute(query).all()
     return render_template("recursos.html", recursos=recursos)
 
 
@@ -410,8 +505,8 @@ def novo_recurso():
         nome = request.form.get("nome", "").strip()
 
         if not nome:
-            flash('Preencha o nome do recurso', 'error')
-            return redirect(url_for('novo_recurso'))
+            flash("Preencha o nome do recurso", "error")
+            return redirect(url_for("novo_recurso"))
 
         novo = Recursos(nome=nome)
         db_session.add(novo)
@@ -446,7 +541,16 @@ def excluir_recurso(recurso_id):
         db_session.delete(recurso)
         db_session.commit()
         flash("Recurso excluído com sucesso", category="success")
-    return redirect(url_for('listar_recursos'))
+    return redirect(url_for("listar_recursos"))
+
+@app.route("/recursos/detalhes/<recurso_id>")
+@login_required
+def detalhes_recurso(recurso_id):
+    recurso = db_session.execute(select(Recursos).where(Recursos.id == recurso_id)).scalar_one_or_none()
+    if not recurso:
+        flash("Recurso não encontrado", "error")
+        return redirect(url_for("listar_recursos"))
+    return render_template("detalhes_recurso.html", recurso=recurso)
 
 
 
